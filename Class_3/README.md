@@ -1,4 +1,5 @@
 # Concepts of the Day
+
 **Image Collection**: As straightforward as it could be, it is a collection of images. You may think of it as a pile of images. The Z-axis represents time, X-axis and Y-axis represent the Earth's surface.
 
 <p align="center">
@@ -11,7 +12,8 @@
     <img src="./Assets/mosaic-2.jpeg" alt="drawing" width="500"/>
 </p>
 
-**Landsat Bit Values**: The Landsat satellites are a family of distinct satellite missions. Each family has its digital characteristics, one of which is the 'bit value' QA Bands. The bit values are a digital parameters that can be used to group out specific pixel characteristics. The QA Bit Values will group the Landsat pixels as belonging to .  Note: Numerically speaking, any number in our screen is originally a binary number (0 or 1).
+**Landsat Bit Values**: The Landsat satellites are a family of distinct satellite missions. Each family has its digital characteristics, one of which is the 'bit value' QA Bands. The bit values are a digital parameters that can be used to group out specific pixel characteristics. The QA Bit Values will group the Landsat pixels as belonging to.
+_Note_: Numerically speaking, any number in our screen is originally a binary number (0 or 1).
 
 <div align=center>
     <table class="table table-striped">
@@ -121,19 +123,21 @@
 # 1. Creating a mosaic
 
 ## 1.1 Creating a region of interest (ROI)
-For this example, we need to define a region of interest using the geometry editing panel on code editor interface. Open the code editor, click on the "draw a shape" button and draw a polygon anywhere in the planet. Be careful not to draw a too large extension, try something around 100km x 100km. The processing of large extensions may delay the execution of this tutorial. In this example, we will change the name of the geometry to  `roi`. 
+
+For this example, we need to define a region of interest using the geometry editing panel on code editor interface. Open the code editor, click on the "draw a shape" button and draw a polygon anywhere in the planet. Be careful, do not draw a too large extension, try something around 100km x 100km. The processing of large extensions may delay the execution of this tutorial. In this example, we will change the name of the geometry to  `roi`. 
 
 ![ROI](./Assets/roi.png)
 [Link](https://code.earthengine.google.com/1e15221cf1d601e3d1a881b11421a062)
 
 ## 1.2 Getting an image collection
+
 ```javascript
 /**
  * Create a Landsat 8 surface reflectance collection, filter by location and date
  */
 
 // Landsat 8 SR collection id
-var collectionId = "LANDSAT/LC08/C02/T1_L2";
+var collectionId = "LANDSAT/LC08/C02/T1_L2"; 
 
 // Create a collection filtering by ROI and date
 var collection = ee.ImageCollection(collectionId)
