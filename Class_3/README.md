@@ -124,7 +124,7 @@
 For this example, we need to define a region of interest using the geometry editing panel on code editor interface. Open the code editor, click on the "draw a shape" button and draw a polygon anywhere in the planet. Be careful not to draw a too large extension, try something around 100km x 100km. The processing of large extensions may delay the execution of this tutorial. In this example, we will change the name of the geometry to  `roi`. 
 
 ![ROI](./Assets/roi.png)
-[Link](https://code.earthengine.google.com/1e15221cf1d601e3d1a881b11421a062)
+[Link](https://code.earthengine.google.com/f8bd92103d3e0791a98ce72eae54b0ca)
 
 ## 1.2 Getting an image collection
 ```javascript
@@ -138,12 +138,12 @@ var collectionId = "LANDSAT/LC08/C02/T1_L2";
 // Create a collection filtering by ROI and date
 var collection = ee.ImageCollection(collectionId)
     .filterBounds(roi)
-    .filterDate('2020-01-01', '2020-12-31');
+    .filterDate('2024-01-01', '2024-12-31');
 
 // prints the collection structure
 print('Initial collection:', collection);
 ```
-[Link](https://code.earthengine.google.com/087c341602e84a934de6c7e33ff4cda1)
+[Link](https://code.earthengine.google.com/f4f98f70b826d49bd19e5c464d734b7f)
 
 The result of the filtered collection is shown on the console.
 
@@ -163,7 +163,7 @@ collection = collection
 // prints the collection structure
 print('Images with less than 50% of cloud cover:', collection);
 ```
-[Link](https://code.earthengine.google.com/6b1928ec388a9cc8b9a608a8a67369e6)
+[Link](https://code.earthengine.google.com/4afaf3d7f8610d949a86ed642a6155e1)
 
 ## 1.4 Applying scaling factor
 
@@ -189,7 +189,7 @@ collection = collection.map(applyScaleFactors);
 
 print('Images reescaled:', collection);
 ```
-[Link](https://code.earthengine.google.com/ddf75cfb2d5bf096071c4096f095989c)
+[Link](https://code.earthengine.google.com/82190fe8e6074e42afd3277da6f3479b)
 
 ## 1.5 Selecting bands
 
@@ -204,11 +204,11 @@ collection = collection.select(bandNames);
 // prints the collection structure
 print('Images with selected bands:', collection);
 ```
-[Link](https://code.earthengine.google.com/3f4e20a5e6775b9da8a19011f8773aa8)
+[Link](https://code.earthengine.google.com/7a5fa836cb15fe91530900c30ae352db)
 
 
 ## 1.6 Adding data to map
-Let's take a look in our selection and see how our collection is visually represented. Right now, we still have cloud pixels inseid our 'roi'. We can use the `inspector` to check the pixel values of the images. Do your inspection!!
+Let's take a look in our selection and see how our collection is visually represented. Right now, we still have cloud pixels inside our 'roi'. We can use the `inspector` to check the pixel values of the images. Do your inspection!!
 
 ```javascript
 // Set a visualization parameters object
@@ -222,7 +222,7 @@ Map.addLayer(collection, visParams, 'collection');
 ```
 ![Add data to map](./Assets/map-add-layer.png)
 
-[Link](https://code.earthengine.google.com/3ab5fc975c1b105426c795215c0db926)
+[Link](https://code.earthengine.google.com/9aef393592ac76082c5608c936cd9efe)
 
 ## 1.7 Removing clouds and shadows
 Here we are going to show a simple way to remove clouds from Landsat images. This technique is very simple and must be combined with other more complex algorithms to generate a better result.
@@ -268,7 +268,7 @@ print('Collection without clouds:', collectionWithoutClouds);
 ```
 
 ![Add data to map](./Assets/collection-without-clouds.png)
-[Link](https://code.earthengine.google.com/3369cfdfe56790fc6c0e703907208a97)
+[Link](https://code.earthengine.google.com/d82d209f13074f7157df6ec3421738ca)
 
 ## 1.8 Calculate NDVI, EVI and NDWI for each image
 ### 1.8.1 Defining NDVI, EVI and NDWI functions
@@ -343,7 +343,7 @@ Map.addLayer(collectionWithIndexes, visNdvi, 'collection with indexes');
 print('collection with indexes:', collectionWithIndexes);
 ```
 ![calculate indexes](./Assets/indexes.png)
-[Link](https://code.earthengine.google.com/49448f8b1a3d60d198f6b2c30f7e91bd)
+[Link](https://code.earthengine.google.com/3d676a7c143134d03365db9aaddbe8d9)
 
 ## 1.9 Make the median, minimum and maximum mosaics
 
@@ -357,7 +357,7 @@ var maximum = collectionWithIndexes.reduce(ee.Reducer.max());
     <img src="./Assets/median-scheme.jpeg" alt="drawing" width="500"/>
 </p>
 
-[Link](https://code.earthengine.google.com/f9fdf5c78cc6cd1690203a6221ef13e7)
+[Link](https://code.earthengine.google.com/90268061b7d91c9cf9ef94bd9963f9a2)
 
 ## 1.10 Make the final mosaic
 
@@ -388,7 +388,7 @@ Map.addLayer(mosaic, visNdvi, 'NDVI median mosaic');
 print('final mosaic:', mosaic);
 ```
 ![Reduce to median](./Assets/median-mosaic.png)
-[Link](https://code.earthengine.google.com/98ad795ac2424ea37fa03e879f366fda)
+[Link](https://code.earthengine.google.com/c94e177102c39e27d58a48768f793666)
 
 ## 1.11 Export mosaic to GEE asset
 
@@ -396,15 +396,15 @@ print('final mosaic:', mosaic);
 // Export the mosaic to your asset
 Export.image.toAsset({
     image: mosaic, 
-    description: 'mosaic-2020', 
-    assetId: 'mosaic-2020', 
+    description: 'mosaic-2024', 
+    assetId: 'mosaic-2024', 
     pyramidingPolicy: {'.default': 'mean'}, 
     region: roi, 
     scale: 30, 
     maxPixels: 1e13
 });
 ```
-[Link](https://code.earthengine.google.com/13878f05742dbff4ce448d0855ea22a5)
+[Link](https://code.earthengine.google.com/eed6fdc8eea16380af8d73d8109161e5)
 
-[Previous: Day 1 - MapBiomas presentation](https://github.com/mapbiomas-brazil/mapbiomas-training/tree/main/MapBiomas_101/Day_1/README.md) | [Next: Day 3 - Classification using Random Forest](https://github.com/mapbiomas-brazil/mapbiomas-training/tree/main/MapBiomas_101/Day_3/README.md)
+[Previous: Class 1 - MapBiomas presentation](https://github.com/mapbiomas-brazil/mapbiomas-training/tree/main/MapBiomas_101/Day_1/README.md) | [Next: Class 3 - Classification using Random Forest](https://github.com/mapbiomas-brazil/mapbiomas-training/tree/main/MapBiomas_101/Day_3/README.md)
 
