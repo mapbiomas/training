@@ -1,4 +1,4 @@
-# Accessing Satellite Images and Creating Mosaics
+# Class 2 - Accessing Satellite Images and Creating Mosaics
 
 # Concepts
 

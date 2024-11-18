@@ -1,4 +1,4 @@
-# Class 1: Introduction to Google Earth Engine
+# Class 1 - Introduction to Google Earth Engine
 
 Presentation: [Link](https://docs.google.com/presentation/d/148CWtz2TQ7Z5VirfchT0eWe7XYrkTFdG/edit#slide=id.p1)
 
