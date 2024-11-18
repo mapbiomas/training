@@ -12,7 +12,7 @@ This training course briefly explains basics of JavaScript programing language, 
 3. [Contact](#contact)
 
 ## Content
-* [Class 1](./Class_1)
+* [Class 1 - Introduction to Google Earth Engine](./Class_1)
 * [Class 2](./Class_2)
 * [Class 3](./Class_3)
 * [Class 4](./Class_4)
