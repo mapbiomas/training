@@ -14,6 +14,7 @@ If you want more details, check this Youtube Video: [StatQuest - Random Forest](
 A beach is most often a white and shiny sand surface, but that is not always true. Along the US or Brazil coasts, there are variations of this pattern. The geochemistry of sediments, humidity levels, and geological origin are all variables that influence the beach's spectral patterns.  A good classifier must be capable of capturing such variability.
 
 # 2. Classification using Random Forest
+
 In this session we will learn how to load an image, collect samples, train a random forest model and perform the classification.
 
 ## 2.1. Load data from asset

@@ -412,5 +412,5 @@ Export.image.toAsset({
 ```
 [Link](https://code.earthengine.google.com/eed6fdc8eea16380af8d73d8109161e5)
 
-[Previous: Class 1 - Introduction to Google Earth Engine](https://github.com/mapbiomas/training/tree/main/Class_1/README.md) | [Next: Class 3 - Classification using Random Forest](https://github.com/mapbiomas-brazil/mapbiomas-training/tree/main/Class_3/README.md)
+[Previous: Class 1 - Introduction to Google Earth Engine](https://github.com/mapbiomas/training/tree/main/Class_1/README.md) | [Next: Class 3 - Classification using Random Forest](https://github.com/mapbiomas/training/tree/main/Class_3/README.md)
 
