@@ -15,7 +15,7 @@ A beach is most often a white and shiny sand surface, but that is not always tru
 
 # 2. Classification using Random Forest
 
-In this session we will learn how to load an image, collect samples, train a random forest model and perform the classification.
+In this section, we will cover how to load an image, collect samples, train a Random Forest model, and perform land cover classification.
 
 ## 2.1. Load data from asset
 
@@ -52,11 +52,14 @@ Map.centerObject(mosaic, 9);
 [Link](https://code.earthengine.google.com/1c89a99b49c7de5c512de4ddaceee9cf)
 
 ## 2.2. Collect manual samples
+
+In this step, we will manually collect samples for the classification process. Using the code editor's shape editing tool, we will draw polygons representing each class and import them as a FeatureCollection
+
 ### 2.2.1. Create a feature collection
 
-In this example, we will classify three land cover classes: `vegetation, not vegetation and water`. For this, it is necessary to collect samples for each class. Using the code editor's shape editing tool ![edit-tool](./Assets/edit-tool.png), we will create three sets of `polygons` and import them as` FeatureCollection`. We will also add a name for each set of geometries. 
+In this example, we will classify three land cover classes: `vegetation`, `notVegetation`, and `water`. To achieve this, we need to collect samples for each class. Using the shape editing tool in the code editor ![edit-tool](./Assets/edit-tool.png), we will create three sets of polygons and import them as a FeatureCollection. Each set of geometries will also be assigned a name. 
 
-The script is prepared to accept the names: `vegetation`,` notVegetation` and `water`. In each set, a property called `class` will be added that will receive a value of 1, 2 or 3 for vegetation, notVegetation and water respectively. You can choose a reference color for each class. See the figure below:
+The script is designed to accept the following class names: `vegetation`, `notVegetation`, and `water`. For each category, a property called class will be added, with values of 1, 2, or 3 corresponding to vegetation, notVegetation, and water, respectively. You can assign a reference color to each class. See the figure below:
 
 ![load image](./Assets/create-feature-collection.png)
 
@@ -67,7 +70,7 @@ Sample collection results in a set of polygons similar to what we see in the nex
 
 ## 2.3. Generate random points
 
-After collecting samples, we need to generate random points within these regions. The proper distribution of the sampling polygons, plus the random distribution inside it, helps us capture the class variability. In this session, we present a function to distribute random points within the polygons defined earlier.
+After collecting the samples, the next step is to generate random points within these regions. Proper distribution of the sampling polygons, combined with the random placement of points within them, ensures better representation of class variability. In this section, we introduce a function to generate random points within the previously defined polygons.
 
 ```javascript
 // Create a function to collect random point inside the polygons
@@ -90,7 +93,9 @@ var generatePoints = function(polygons, nPoints){
 };
 ```
 
-Then, we use this function to collect the points in each group of polygons created. Note that the function takes two arguments: `polygons` and` nPoints`. These arguments are the `drawn polygons` and the` number of points we want to collect.` There are other, more accurate ways to define the number of points to be collected. For example, we can determine the size of the set of points using as a reference the proportion of the known area of your region of interest `ROI`. The purpose of this tutorial is to show an introductory approach, and that is why we are empirically defining 100 points for `vegetation,` 100 points for` notVegetation`, and 50 points for `water.`
+Then, we use this function to collect the points in each group of polygons created. Note that the function takes two arguments: _polygons_ and _nPoints_. These arguments are the drawn polygons and the number of points we want to collect.
+
+There are other, more accurate ways to define the number of points to be collected. For example, we can determine the size of the set of points using the proportion of the known area of your region of interest (ROI) as a reference. However, the purpose of this tutorial is to demonstrate an introductory approach. For simplicity, we empirically define 100 points for vegetation, 100 points for notVegetation, and 50 points for water.
 
 ```javascript
 // Collect random points inside your polygons
@@ -118,7 +123,7 @@ Map.addLayer(samples.filter(ee.Filter.eq('class', 3)), {color: '#1488ff'}, 'samp
 
 ## 2.4. Collect the spectral information
 
-Once we have the samples for the defined classes, we need to capture the spectral information in its pixels 
+Once we have the samples for the defined classes, the next step is to extract the spectral information from their pixels.
 
 ```javascript
 // Collect the spectral information to get the trained samples
@@ -143,7 +148,7 @@ print(trainedSamples);
 
 ## 2.5. Training the Random Forest classifier
 
-We will use the `ee.Classifier.smileRandomForest()` function to configure our Random Forest model. The documentation for this function teaches us that we can configure the following set of parameters::
+We will use the `ee.Classifier.smileRandomForest()` function to configure our Random Forest model. According to the documentation, this function allows us to set the following parameters:
 
 **Arguments:**
 - **numberOfTrees (Integer)**: The number of decision trees to create.
@@ -163,6 +168,13 @@ var classifier = ee.Classifier.smileRandomForest({
 ```
 
 Our model is configured, but we still need to train it with the sample points we selected. In this step, we use the `train()` function and will receive at least three arguments: `features`, `classProperties` and `inputProperties`. In `features`, we insert the variable `trainedSamples` that stores our points containing the class value and the pixel value in all bands. We define `classProperties` equal to 'class', because it is the property that stores the point's class number value. Finally, we insert in `inputProperties` a list with the names of the bands that we will use to train the classifier. We are using all the median, minimum, and maximum bands, but feel free to test the combination you want. There is a more robust method to define each band's relevance within the Random Forest training model. Let's speak of attribute/band relevance in future opportunities! That's all for today!
+
+Our model is configured, but we still need to train it using the sample points we collected. For this step, we use the `train()` function, which requires at least three arguments: `features`, `classProperty`, and `inputProperties`.
+
+* In `features`, we pass the variable `trainedSamples`, which contains our points along with their class values and pixel values for all bands.
+* For `classProperty`, we set it to 'class', as this property stores the numerical value representing each point's class.
+* Finally, in `inputProperties`, we provide a list of band names that will be used to train the classifier. In this example, we are using all the median, minimum, and maximum bands, but feel free to experiment with different combinations.
+There are more advanced methods to evaluate the importance of each band in the Random Forest training process. We’ll explore band/attribute relevance in future discussions.
 
 ```javascript
 // Training the classifier
@@ -240,4 +252,4 @@ Export.image.toAsset({
 
 [Link](https://code.earthengine.google.com/207e6bd17ea66726d081ed709c8687b2)
 
-[Previous: Day 2 - Accessing Satellite Images and Creating Mosaics](https://github.com/mapbiomas-brazil/mapbiomas-training/tree/main/MapBiomas_101/Day_2/README.md) | [Next: Day 4 - Spatial filter, Temporal Filter and Area Calculation](https://github.com/mapbiomas-brazil/mapbiomas-training/tree/main/MapBiomas_101/Day_4/README.md)
+[Previous: Day 2 - Accessing Satellite Images and Creating Mosaics](https://github.com/mapbiomas/training/tree/main/Class_2/README.md) | [Next: Day 4 - Spatial filter, Temporal Filter and Area Calculation](https://github.com/mapbiomas/training/tree/main/Class_4/README.md)
