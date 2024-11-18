@@ -49,7 +49,7 @@ Map.addLayer(mosaic, visParams, 'Mosaic');
 Map.centerObject(mosaic, 9);
 ```
 ![load image](./Assets/load-image.png)
-[Link](https://code.earthengine.google.com/1c89a99b49c7de5c512de4ddaceee9cf)
+[Link](https://code.earthengine.google.com/f4fd395fee6b2e8e8d1cac0718d62f3f)
 
 ## 2.2. Collect manual samples
 
@@ -66,7 +66,7 @@ The script is designed to accept the following class names: `vegetation`, `notVe
 Sample collection results in a set of polygons similar to what we see in the next figure:
 
 ![samples](./Assets/samples.png)
-[Link](https://code.earthengine.google.com/c3168af89c0dcab70885cf0a73674615)
+[Link](https://code.earthengine.google.com/ec0fb9fe4cff4f69b80a0a99c10f673e)
 
 ## 2.3. Generate random points
 
@@ -119,7 +119,7 @@ Map.addLayer(samples.filter(ee.Filter.eq('class', 2)), {color: '#fff104'}, 'samp
 Map.addLayer(samples.filter(ee.Filter.eq('class', 3)), {color: '#1488ff'}, 'samples');
 ```
 ![samples](./Assets/generate-random-points.png)
-[Link](https://code.earthengine.google.com/8bdf55ba47b8d538debb65897931ad34)
+[Link](https://code.earthengine.google.com/5dd147661fd363d47970d49f8eabd9bd)
 
 ## 2.4. Collect the spectral information
 
@@ -144,7 +144,7 @@ print(trainedSamples);
     <img src="./Assets/trained-samples.png" alt="drawing" width="400"/>
 </p>
 
-[Link](https://code.earthengine.google.com/2222f52f386e92f3e7c4ff9f2a1991bb)
+[Link](https://code.earthengine.google.com/2fa841a3f02abe28dfe7d881592a338d)
 
 ## 2.5. Training the Random Forest classifier
 
@@ -225,7 +225,7 @@ var classification = mosaic.classify(classifier);
 Map.addLayer(classification, {
         'min': 0,
         'max': 3,
-        'palette': ['#ffffff','#005b2b','#fff104','#1488ff'],,
+        'palette': ['#ffffff','#005b2b','#fff104','#1488ff'],
         'format': 'png'
     },
     'classification'
@@ -233,7 +233,7 @@ Map.addLayer(classification, {
 ```
 
 ![samples](./Assets/classification.png)
-[Link](https://code.earthengine.google.com/3dba3901a9fe0b3142f8ab96dc525ba7)
+[Link](https://code.earthengine.google.com/765caed56a3c4456333da73f9b18ba2d)
 
 ## 2.7. Export classification to asset
 
@@ -250,6 +250,6 @@ Export.image.toAsset({
 });
 ```
 
-[Link](https://code.earthengine.google.com/207e6bd17ea66726d081ed709c8687b2)
+[Link](https://code.earthengine.google.com/2ac1d4e36ccaa4e209703a51b18b5082)
 
-[Previous: Day 2 - Accessing Satellite Images and Creating Mosaics](https://github.com/mapbiomas/training/tree/main/Class_2/README.md) | [Next: Day 4 - Spatial filter, Temporal Filter and Area Calculation](https://github.com/mapbiomas/training/tree/main/Class_4/README.md)
+[Previous: Class 2 - Accessing Satellite Images and Creating Mosaics](https://github.com/mapbiomas-brazil/mapbiomas-training/tree/main/MapBiomas_101/Day_2/README.md) | [Next: Class 4 - Spatial filter, Temporal Filter and Area Calculation](https://github.com/mapbiomas/mapbiomas/tree/main/Class_4/README.md)
