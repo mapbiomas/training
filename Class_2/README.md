@@ -1,4 +1,6 @@
-# Concepts of the Day
+# Accessing Satellite Images and Creating Mosaics
+
+# Concepts
 
 **Image Collection**: As straightforward as it could be, it is a collection of images. You may think of it as a pile of images. The Z-axis represents time, X-axis and Y-axis represent the Earth's surface.
 
@@ -410,5 +412,5 @@ Export.image.toAsset({
 ```
 [Link](https://code.earthengine.google.com/eed6fdc8eea16380af8d73d8109161e5)
 
-[Previous: Class 1 - MapBiomas presentation](https://github.com/mapbiomas-brazil/mapbiomas-training/tree/main/MapBiomas_101/Day_1/README.md) | [Next: Class 3 - Classification using Random Forest](https://github.com/mapbiomas-brazil/mapbiomas-training/tree/main/MapBiomas_101/Day_3/README.md)
+[Previous: Class 1 - Introduction to Google Earth Engine](https://github.com/mapbiomas/training/tree/main/Class_1/README.md) | [Next: Class 3 - Classification using Random Forest](https://github.com/mapbiomas-brazil/mapbiomas-training/tree/main/Class_3/README.md)
 
