@@ -25,7 +25,7 @@ Use `ee.Image()` function to load the image mosaic.
 
 ```javascript
 // Choose an image asset id
-var imageId = "users/joaovsiqueira1/mapbiomas-training/mosaic-2020";
+var imageId = "projects/mapbiomas-suriname/assets/mosaic-2024";
 
 // Load as an image
 var mosaic = ee.Image(imageId);
