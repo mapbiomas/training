@@ -8,7 +8,7 @@
     <img src="./Assets/image-collection.jpeg" alt="drawing" width="350"/>
 </p>
 
-**Mosaic**: A mosaic is a combination or merging of two or more matrices. Any given mosaic can be a multiband or single-band mosaic. The MapBiomas project works with the concept of multiband mosaics.
+**Mosaic**: A mosaic is a combination or merging of two or more images. Any given mosaic can be a multiband or single-band mosaic. The MapBiomas project works with the concept of multiband mosaics.
 
 <p align="center">
     <img src="./Assets/mosaic-2.jpeg" alt="drawing" width="500"/>
