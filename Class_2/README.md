@@ -61,8 +61,8 @@ var collectionId = "LANDSAT/LC08/C02/T1_L2";
 
 // Create an image collection filtered by the region of interest (ROI) and a specific date range.
 var collection = ee.ImageCollection(collectionId)
-    .filterBounds(roi)                       // Filter collection by region of interest (ROI).
-    .filterDate('2024-01-01', '2024-12-31'); // Filter collection by date range (year 2024).
+    .filter(ee.Filter.bounds(roi))                        // Filter collection by region of interest (ROI).
+    .filter(.ee.Filter.date('2024-01-01', '2024-12-31')); // Filter collection by date range (year 2024).
 
 // Print the structure of the filtered collection to the console.
 print('Initial collection:', collection);
@@ -82,7 +82,7 @@ We can filter the images inside an Image Collection using any information contai
 ```javascript
 // Filter images with less than 50% of cloud cover
 collection = collection
-    .filterMetadata('CLOUD_COVER', 'less_than', 50);
+    .filter(ee.Filter.lt('CLOUD_COVER', 50));
 
 // prints the collection structure
 print('Images with less than 50% of cloud cover:', collection);
