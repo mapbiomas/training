@@ -56,15 +56,15 @@ For this example, we need to define a region of interest using the geometry edit
  * Create a Landsat 8 surface reflectance collection, filter by location and date
  */
 
-// Landsat 8 SR collection id
+// Landsat 8 Surface Reflectance collection ID
 var collectionId = "LANDSAT/LC08/C02/T1_L2"; 
 
-// Create a collection filtering by ROI and date
+// Create an image collection filtered by the region of interest (ROI) and a specific date range.
 var collection = ee.ImageCollection(collectionId)
-    .filterBounds(roi)
-    .filterDate('2024-01-01', '2024-12-31');
+    .filterBounds(roi)                       // Filter collection by region of interest (ROI).
+    .filterDate('2024-01-01', '2024-12-31'); // Filter collection by date range (year 2024).
 
-// prints the collection structure
+// Print the structure of the filtered collection to the console.
 print('Initial collection:', collection);
 ```
 [Link](https://code.earthengine.google.com/f4f98f70b826d49bd19e5c464d734b7f)
