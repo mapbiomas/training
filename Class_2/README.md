@@ -205,7 +205,7 @@ print('Collection without clouds:', collectionWithoutClouds);
 ```
 
 ![Add data to map](./Assets/collection-without-clouds.png)
-[Link](https://code.earthengine.google.com/d82d209f13074f7157df6ec3421738ca)
+[Link](https://code.earthengine.google.com/da0ca4df28c4868b253ae89d31d23df9)
 
 ## 1.8 Calculate NDVI, EVI and NDWI for each image
 ### 1.8.1 Defining NDVI, EVI and NDWI functions
