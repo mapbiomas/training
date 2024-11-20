@@ -17,104 +17,22 @@
 **Landsat Bit Values**: The Landsat satellites are a family of distinct satellite missions. Each family has its digital characteristics, one of which is the 'bit value' QA Bands. The bit values are a digital parameters that can be used to group out specific pixel characteristics. The QA Bit Values will group the Landsat pixels as belonging to.
 _Note_: Numerically speaking, any number in our screen is originally a binary number (0 or 1).
 
-<div align=center>
-    <table class="table table-striped">
-        <caption>
-            <h4><strong>Landsat Surface Reflectance-Derived Spectral Indices Pixel Quality Band: Landsat 8</strong></h4>
-        </caption>
-        <thead>
-        </thead>
-        <tbody style="font-size:12px;">
-            <tr class="alt">
-                <td colspan="100">
-                    <ul>
-                        <li>
-                            Bit 0: Fill
-                            <ul>
-                            </ul>
-                        </li>
-                        <li>
-                            Bit 1: Dilated Cloud
-                            <ul>
-                            </ul>
-                        </li>
-                        <li>
-                            Bit 2: Cirrus (high confidence)
-                            <ul>
-                            </ul>
-                        </li>
-                        <li>
-                            Bit 3: Cloud
-                            <ul>
-                            </ul>
-                        </li>
-                        <li>
-                            Bit 4: Cloud Shadow
-                            <ul>
-                            </ul>
-                        </li>
-                        <li>
-                            Bit 5: Snow
-                            <ul>
-                            </ul>
-                        </li>
-                        <li>
-                            Bit 6: Clear
-                            <ul>
-                                <li>0: Cloud or Dilated Cloud bits are set</li>
-                                <li>1: Cloud and Dilated Cloud bits are not set</li>
-                            </ul>
-                        </li>
-                        <li>
-                            Bit 7: Water
-                            <ul>
-                            </ul>
-                        </li>
-                        <li>
-                            Bits 8-9: Cloud Confidence
-                            <ul>
-                                <li>0: None</li>
-                                <li>1: Low</li>
-                                <li>2: Medium</li>
-                                <li>3: High</li>
-                            </ul>
-                        </li>
-                        <li>
-                            Bits 10-11: Cloud Shadow Confidence
-                            <ul>
-                                <li>0: None</li>
-                                <li>1: Low</li>
-                                <li>2: Medium</li>
-                                <li>3: High</li>
-                            </ul>
-                        </li>
-                        <li>
-                            Bits 12-13: Snow/Ice Confidence
-                            <ul>
-                                <li>0: None</li>
-                                <li>1: Low</li>
-                                <li>2: Medium</li>
-                                <li>3: High</li>
-                            </ul>
-                        </li>
-                        <li>
-                            Bits 14-15: Cirrus Confidence
-                            <ul>
-                                <li>0: None</li>
-                                <li>1: Low</li>
-                                <li>2: Medium</li>
-                                <li>3: High</li>
-                            </ul>
-                        </li>
-                    </ul>
-                    </devsite-expandable>
-                </td>
-            </tr>
-        </tbody>
-    </table>
-</div>
+### Landsat Surface Reflectance-Derived Spectral Indices Pixel Quality Band: Landsat 8
 
-
+| **Bit Position** | **Description**                  | **Values**                                                                                                                                      | **Bit Combinations (Binary)** | **Decimal Equivalent** |
+|-------------------|----------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------|--------------------------------|-------------------------|
+| **0**            | *Fill*                          | Identifies fill pixels (no valid data).                                                                                                        | `0`, `1`                      | 0, 1                   |
+| **1**            | *Dilated Cloud*                 | Indicates presence of dilated clouds (buffered clouds).                                                                                        | `0`, `1`                      | 0, 1                   |
+| **2**            | *Cirrus (high confidence)*      | Indicates presence of high-confidence cirrus clouds.                                                                                           | `0`, `1`                      | 0, 1                   |
+| **3**            | *Cloud*                         | Identifies presence of regular clouds.                                                                                                         | `0`, `1`                      | 0, 1                   |
+| **4**            | *Cloud Shadow*                  | Indicates presence of cloud shadows.                                                                                                           | `0`, `1`                      | 0, 1                   |
+| **5**            | *Snow*                          | Indicates presence of snow.                                                                                                                    | `0`, `1`                      | 0, 1                   |
+| **6**            | *Clear*                         | `0`: Clouds (Cloud or Dilated Cloud bits are set). <br> `1`: Clear (Cloud and Dilated Cloud bits are not set).                                 | `0`, `1`                      | 0, 1                   |
+| **7**            | *Water*                         | Indicates water pixels.                                                                                                                        | `0`, `1`                      | 0, 1                   |
+| **8-9**          | *Cloud Confidence*              | `00`: None <br> `01`: Low confidence <br> `10`: Medium confidence <br> `11`: High confidence.                                                  | `00`, `01`, `10`, `11`        | 0, 1, 2, 3            |
+| **10-11**        | *Cloud Shadow Confidence*       | `00`: None <br> `01`: Low confidence <br> `10`: Medium confidence <br> `11`: High confidence.                                                  | `00`, `01`, `10`, `11`        | 0, 1, 2, 3            |
+| **12-13**        | *Snow/Ice Confidence*           | `00`: None <br> `01`: Low confidence <br> `10`: Medium confidence <br> `11`: High confidence.                                                  | `00`, `01`, `10`, `11`        | 0, 1, 2, 3            |
+| **14-15**        | *Cirrus Confidence*             | `00`: None <br> `01`: Low confidence <br> `10`: Medium confidence <br> `11`: High confidence.                                                  | `00`, `01`, `10`, `11`        | 0, 1, 2, 3            |
 
 **Vegetation and Water Index**: A Vegetation Index (VI) or Water Index (WI) are spectral transformations of two or more bands designed to enhance the contribution of vegetation/water properties in a given satellite data.
 
