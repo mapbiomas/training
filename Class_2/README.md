@@ -136,12 +136,21 @@ print('Images reescaled:', collection);
 In this example we will use the bands `blue, green, red, nir, swir 1 and swir 2` which are respectively named` B2, B3, B4, B5, B6, B7`. It is necessary to select the quality band also, `pixel_qa`, as it will be used later to remove the clouds and shadows.
 
 ```javascript
-var bandNames = ['SR_B2','SR_B3','SR_B4','SR_B5','SR_B6','SR_B7','QA_PIXEL'];
+// Define the list of band names to be selected from each image in the collection.
+var bandNames = [
+    'SR_B2',   // Blue band
+    'SR_B3',   // Green band
+    'SR_B4',   // Red band
+    'SR_B5',   // Near-infrared band
+    'SR_B6',   // SWIR1 band
+    'SR_B7',   // SWIR2 band
+    'QA_PIXEL' // Quality band
+];
 
-// Select bands of interest
-collection = collection.select(bandNames);
+// Select the specified bands from the collection.
+collection = collection.select(bandNames); // Only retains the bands in 'bandNames'.
 
-// prints the collection structure
+// Print the structure of the collection after selecting the bands to the console for verification.
 print('Images with selected bands:', collection);
 ```
 [Link](https://code.earthengine.google.com/7a5fa836cb15fe91530900c30ae352db)
