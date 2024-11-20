@@ -32,8 +32,9 @@ For more details, see the [LICENSE](./LICENSE.md) file.
 
 If you have any questions or suggestions, feel free to reach out:  
 
-- João Siqueira, [joaovsiqueira1@gmail.com](mailto:joaovsiqueira1@gmail.com)
+| Name             | E-mail                     |
+|------------------|----------------------------|
+| João Siqueira    | joaovsiqueira1@gmail.com   |
+| Julia Cansado    | julia.cansado@gmail.com    |
+| Joaquim Pereira  | joaquim.pereira@ipam.org.br |
 
-- Julia Cansado, [julia.cansado@gmail.com](mailto:julia.cansado@gmail.com)
-
-- Joaquim Pereira, [joaquim.pereira@ipam.org.br](mailto:joaquim.pereira@ipam.org.br)
