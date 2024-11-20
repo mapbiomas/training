@@ -129,6 +129,29 @@ collection = collection.map(applyScaleFactors);
 print('Images reescaled:', collection);
 
 ```
+
+## Why Do We Need to Apply Scaling Factors?
+
+In the Google Earth Engine, raw values in optical and thermal bands (known as *Digital Numbers* or DNs) do not directly represent physical units like reflectance or temperature. Applying scaling factors is necessary for several reasons:
+
+### 1. To Interpret the Data Correctly
+- **Optical Bands (`SR_B.*`)**: These typically represent surface reflectance. Scaling factors and offsets provided in the image metadata are applied to convert raw values into true reflectance. Without this, the values lack physical meaning.
+- **Thermal Bands (`ST_B.*`)**: These represent surface temperature in scaled units. Without correction, they do not represent temperatures in Kelvin or Celsius, making them difficult to analyze.
+
+### 2. To Ensure Consistency with Other Data Sources
+Remote sensing data is often compared or integrated with other sources, such as field measurements. To make these comparisons valid, the values must be converted into standardized physical units.
+
+### 3. To Prepare Data for Advanced Analyses
+Scaling is critical for accurate results in:
+- Vegetation models
+- Spectral indices (e.g., NDVI, EVI)
+- Climate studies  
+Unscaled values may produce incorrect or meaningless outputs.
+
+### 4. To Facilitate Visualization and Interpretation
+- Rescaling optical bands to integer values (e.g., by multiplying by 10,000) makes them more intuitive for visualization.
+- Many tools expect reflectance values to fall within a standard range, such as 0 to 10,000.
+
 <!--[Link](https://code.earthengine.google.com/82190fe8e6074e42afd3277da6f3479b)-->
 
 ## 1.5 Selecting bands
