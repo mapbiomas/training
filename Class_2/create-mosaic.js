@@ -79,10 +79,12 @@ var cloudMasking = function (image) {
 
     var qaBand = image.select(['QA_PIXEL']);
 
-    var cloud = qaBand.bitwiseAnd(Math.pow(2, 3)).not(); 
-    var cloudEdge = qaBand.bitwiseAnd(Math.pow(2, 1)).not(); 
-    var shadow = qaBand.bitwiseAnd(Math.pow(2, 4)).not(); 
+    // Extract specific bits using bitwise shift (>>)
+    var cloud = qaBand.rightShift(3).bitwiseAnd(1).not(); // Cloud (Bit 3)
+    var cloudEdge = qaBand.rightShift(1).bitwiseAnd(1).not(); // Dilated Cloud (Bit 1)
+    var shadow = qaBand.rightShift(4).bitwiseAnd(1).not(); // Cloud Shadow (Bit 4)
     
+    // Apply masks
     image = image.updateMask(cloud);
     image = image.updateMask(cloudEdge);
     image = image.updateMask(shadow);
