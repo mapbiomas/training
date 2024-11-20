@@ -62,7 +62,7 @@ var collectionId = "LANDSAT/LC08/C02/T1_L2";
 // Create an image collection filtered by the region of interest (ROI) and a specific date range.
 var collection = ee.ImageCollection(collectionId)
     .filter(ee.Filter.bounds(roi))                        // Filter collection by region of interest (ROI).
-    .filter(.ee.Filter.date('2024-01-01', '2024-12-31')); // Filter collection by date range (year 2024).
+    .filter(ee.Filter.date('2024-01-01', '2024-12-31')); // Filter collection by date range (year 2024).
 
 // Print the structure of the filtered collection to the console.
 print('Initial collection:', collection);
