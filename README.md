@@ -13,7 +13,7 @@ This training course briefly explains basics of JavaScript programing language, 
 
 ## Content
 * [Class 1 - Introduction to Google Earth Engine](./Class_1)
-* [Class 2](./Class_2)
+* [Class 2 - Accessing Satellite Images and Creating Mosaics](./Class_2)
 * [Class 3](./Class_3)
 * [Class 4](./Class_4)
 * [Class 5](./Class_5)
