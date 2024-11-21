@@ -25,7 +25,7 @@ Use `ee.Image()` function to load the image mosaic.
 
 ```javascript
 // Choose an image asset id
-var imageId = "users/joaovsiqueira1/mapbiomas-training/mosaic-2020";
+var imageId = "projects/mapbiomas-suriname/assets/mosaic-2024";
 
 // Load as an image
 var mosaic = ee.Image(imageId);
@@ -241,9 +241,9 @@ Map.addLayer(classification, {
 // Export the classification to your asset
 Export.image.toAsset({
     image: classification, 
-    description: 'classification-2020', 
-    assetId: 'classification-2020', 
-    pyramidingPolicy: {'.default': 'mode'}, // use mode for classification data
+    description: 'classification-2024', 
+    assetId: 'classification-2024', 
+    pyramidingPolicy: {'.default': 'sample'}, // use sample for classification data
     region: classification.geometry(), 
     scale: 30, 
     maxPixels: 1e13
