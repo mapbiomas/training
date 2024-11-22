@@ -1,5 +1,43 @@
 # Class 2 - Accessing Satellite Images and Creating Mosaics
 
+# Sumário
+
+### [Concepts](#concepts)
+
+### [2.1. Creating a mosaic](#21-creating-a-mosaic)
+  - [2.1.1. Creating a region of interest (ROI)](#211-creating-a-region-of-interest-roi)
+  - [2.1.2. Getting an image collection](#212-getting-an-image-collection)
+  - [2.1.3. Filtering by cloud cover percentage](#213-filtering-by-cloud-cover-percentage)
+  - [2.1.4. Applying scaling factor](#214-applying-scaling-factor)
+  - [2.1.5. Selecting bands](#215-selecting-bands)
+  - [2.1.6. Adding data to map](#216-adding-data-to-map)
+  - [2.1.7. Why Do We Need to Apply Scaling Factors?](#217-why-do-we-need-to-apply-scaling-factors)
+    - [a. To Interpret the Data Correctly](#a-to-interpret-the-data-correctly)
+    - [b. To Ensure Consistency with Other Data Sources](#b-to-ensure-consistency-with-other-data-sources)
+    - [c. To Prepare Data for Advanced Analyses](#c-to-prepare-data-for-advanced-analyses)
+    - [d. To Facilitate Visualization and Interpretation](#d-to-facilitate-visualization-and-interpretation)
+  - [2.1.8. Removing clouds and shadows](#22-removing-clouds-and-shadows)
+  - [2.1.9. Define a cloud masking function](#221-define-a-cloud-masking-function)
+    - [How it works?](#how-it-works)
+      - Example: Extraction of Bit 3 (Cloud)
+  - [2.1.10. Apply the cloud masking function to each image](#222-apply-the-cloud-masking-function-to-each-image)
+  - [2.1.11. Calculate NDVI, EVI, and NDWI for each image](#23-calculate-ndvi-evi-and-ndwi-for-each-image)
+  - [2.1.12. Defining NDVI, EVI, and NDWI functions](#231-defining-ndvi-evi-and-ndwi-functions)
+  - [2.1.13. Indices: NDVI, NDWI, and EVI](#232-indices-ndvi-ndwi-and-evi)
+    - [a. NDVI (Normalized Difference Vegetation Index)](#a-ndvi-normalized-difference-vegetation-index)
+    - [b. NDWI (Normalized Difference Water Index)](#b-ndwi-normalized-difference-water-index)
+      - _Version 1: Focused on Water Bodies (McFeeters, 1996)_
+      - _Version 2: Focused on Vegetation Water Content (Gao, 1996)_
+    - [c. EVI (Enhanced Vegetation Index)](#c-evi-enhanced-vegetation-index)
+    - [d. Comparison Table](#d-comparison-table)
+  - [2.1.14. Apply the functions to each image](#233-apply-the-functions-to-each-image)
+  - [2.1.15. Make the median, minimum, and maximum mosaics](#24-make-the-median-minimum-and-maximum-mosaics)
+  - [2.1.16. Make the final mosaic](#25-make-the-final-mosaic)
+
+### [2.2. Export mosaic to GEE asset](#26-export-mosaic-to-gee-asset)
+
+
+---
 # Concepts
 
 **Image Collection**: As straightforward as it could be, it is a collection of images. You may think of it as a pile of images. The Z-axis represents time, X-axis and Y-axis represent the Earth's surface.
@@ -40,16 +78,16 @@ _Note_: Numerically speaking, any number in our screen is originally a binary nu
     <img src="./Assets/NDVI-Values-and-Plant-Health.png" alt="drawing" width="500"/>
 </p>
 
-# 1. Creating a mosaic
+# 2. Creating a mosaic
 
-## 1.1 Creating a region of interest (ROI)
+## 2.1. Creating a region of interest (ROI)
 
 For this example, we need to define a region of interest using the geometry editing panel on code editor interface. Open the code editor, click on the "draw a shape" button and draw a polygon anywhere in the planet. Be careful, do not draw a too large extension, try something around 100km x 100km. The processing of large extensions may delay the execution of this tutorial. In this example, we will change the name of the geometry to  `roi`. 
 
 ![ROI](./Assets/roi.png)
 <!--[Link](https://code.earthengine.google.com/f8bd92103d3e0791a98ce72eae54b0ca)-->
 
-## 1.2 Getting an image collection
+## 2.2. Getting an image collection
 
 ```javascript
 /**
@@ -75,7 +113,7 @@ The result of the filtered collection is shown on the console.
     <img src="./Assets/console-information.png" alt="drawing" width="500"/>
 </p>
 
-## 1.3 Filtering by cloud cover percentage
+## 2.3. Filtering by cloud cover percentage
 
 We can filter the images inside an Image Collection using any information contained in the image's metadata. In this example, we will use the `CLOUD_COVER` property. This property stores the percentage of cloud cover detected by the USGS algorithm.
 
@@ -89,7 +127,7 @@ print('Images with less than 50% of cloud cover:', collection);
 ```
 <!--[Link](https://code.earthengine.google.com/4afaf3d7f8610d949a86ed642a6155e1)-->
 
-## 1.4 Applying scaling factor
+## 2.4. Applying scaling factor
 
 ```javascript
 /**
@@ -130,25 +168,25 @@ print('Images reescaled:', collection);
 
 ```
 
-## Why Do We Need to Apply Scaling Factors?
+## 2.4.1. Why Do We Need to Apply Scaling Factors?
 
 In the Google Earth Engine, raw values in optical and thermal bands (known as *Digital Numbers* or DNs) do not directly represent physical units like reflectance or temperature. Applying scaling factors is necessary for several reasons:
 
-### 1. To Interpret the Data Correctly
+### a. To Interpret the Data Correctly
 - **Optical Bands (`SR_B.*`)**: These typically represent surface reflectance. Scaling factors and offsets provided in the image metadata are applied to convert raw values into true reflectance. Without this, the values lack physical meaning.
 - **Thermal Bands (`ST_B.*`)**: These represent surface temperature in scaled units. Without correction, they do not represent temperatures in Kelvin or Celsius, making them difficult to analyze.
 
-### 2. To Ensure Consistency with Other Data Sources
+### b. To Ensure Consistency with Other Data Sources
 Remote sensing data is often compared or integrated with other sources, such as field measurements. To make these comparisons valid, the values must be converted into standardized physical units.
 
-### 3. To Prepare Data for Advanced Analyses
+### c. To Prepare Data for Advanced Analyses
 Scaling is critical for accurate results in:
 - Vegetation models
 - Spectral indices (e.g., NDVI, EVI)
 - Climate studies  
 Unscaled values may produce incorrect or meaningless outputs.
 
-### 4. To Facilitate Visualization and Interpretation
+### d. To Facilitate Visualization and Interpretation
 - Rescaling optical bands to integer values (e.g., by multiplying by 10,000) makes them more intuitive for visualization.
 - Many tools expect reflectance values to fall within a standard range, such as 0 to 10,000.
 
@@ -333,6 +371,98 @@ var computeEVI = function (image) {
 };
 
 ```
+# Indices: NDVI, NDWI, and EVI
+
+### A. NDVI (Normalized Difference Vegetation Index)
+
+**Definition:**
+NDVI measures vegetation "vitality" or "density" by analyzing how plants reflect light. It uses the red (Red) and near-infrared (NIR) bands.
+
+**Formula:**
+`NDVI = (NIR - Red) / (NIR + Red)`
+
+**Components:**
+- **NIR (Near-Infrared):** Strongly reflected by healthy leaves due to their cellular structure.
+- **Red (Visible Red):** Absorbed by chlorophyll during photosynthesis.
+
+**Typical Values:**
+- **Water or artificial surfaces:** NDVI near -1.
+- **Bare soil:** NDVI near 0.
+- **Sparse vegetation:** NDVI between 0 and 0.2.
+- **Dense vegetation:** NDVI above 0.5.
+
+**Applications:**
+- Monitoring vegetation health, density, and cover.
+- Deforestation and forest regeneration analysis.
+- Agriculture (detecting water stress, crop growth).
+
+---
+
+### B. NDWI (Normalized Difference Water Index)
+
+#### _Version 1: Focused on Water Bodies (McFeeters, 1996)_
+
+**Formula:**
+`NDWI = (Green - NIR) / (Green + NIR)`
+
+**Components:**
+- **Green (Visible Green):** Reflects more strongly in water bodies.
+- **NIR (Near-Infrared):** Absorbed by water bodies but reflects more in soil and vegetation.
+
+**Typical Values:**
+- **Water:** Positive values, usually > 0.1.
+- **Soil or vegetation:** Negative or near zero values.
+
+#### _Version 2: Focused on Vegetation Water Content (Gao, 1996)_
+
+**Formula:**
+`NDWI = (NIR - SWIR) / (NIR + SWIR)`
+
+**Components:**
+- **NIR (Near-Infrared):** Sensitive to leaf structure.
+- **SWIR (Shortwave Infrared):** Sensitive to water content in vegetation.
+
+**Applications:**
+- Identifying water bodies and seasonal changes.
+- Estimating water content in vegetation.
+- Monitoring droughts and dry conditions.
+
+---
+
+### C. EVI (Enhanced Vegetation Index)
+
+**Definition:**
+EVI improves upon NDVI by minimizing atmospheric (e.g., haze) and soil effects, providing a more accurate measure of dense vegetation.
+
+**Formula:**
+`EVI = G * (NIR - Red) / (NIR + C1 * Red - C2 * Blue + L)`
+
+**Components:**
+- **NIR (Near-Infrared):** Strongly reflected by healthy leaves.
+- **Red (Visible Red):** Absorbed by chlorophyll.
+- **Blue (Visible Blue):** Used for atmospheric correction.
+- **G (Gain):** Typically set to 2.5.
+- **C1 and C2 (Correction Coefficients):** Usually 6 and 7.5, respectively.
+- **L (Adjustment Factor):** Minimizes soil effects, typically set to 1.
+
+**Applications:**
+- Studies in tropical areas and dense forests where NDVI saturates.
+- Monitoring vegetation health in high biomass areas.
+- Agricultural and forestry analysis.
+
+---
+
+### D. Comparison Table
+
+| **Index** | **Primary Focus**            | **Sensitivity**                              | **Limitations**                                                           |
+|-----------|------------------------------|----------------------------------------------|---------------------------------------------------------------------------|
+| **NDVI**  | Vegetation health/density    | Variability in vegetation                    | Saturates in dense vegetation; sensitive to atmospheric effects.          |
+| **NDWI**  | Water content (land/water)   | Identifies water bodies and water content    | Sensitive to water turbidity and atmospheric factors.                     |
+| **EVI**   | Enhanced vegetation analysis | Corrects soil and atmospheric interference   | Requires more bands and involves more complex calculations.               |
+
+---
+
+These indices are complementary and can be used together for a comprehensive environmental analysis.
 
 ### 1.8.2 Apply the functions to each image
 

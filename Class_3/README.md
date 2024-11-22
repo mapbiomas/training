@@ -24,13 +24,13 @@ In this section, we will cover how to load an image, collect samples, train a Ra
 Use `ee.Image()` function to load the image mosaic.
 
 ```javascript
-// Choose an image asset id
-var imageId = "users/joaovsiqueira1/mapbiomas-training/mosaic-2020";
+// Load the mosaic as an ee.Image
+var imageId = "projects/mapbiomas-suriname/assets/mosaic-2024";
 
-// Load as an image
+// Load the image using ee.Image
 var mosaic = ee.Image(imageId);
 
-// prints the collection structure
+// Print the loaded image to the console to check its structure
 print('Mosaic:', mosaic);
 ```
 
@@ -38,15 +38,16 @@ print('Mosaic:', mosaic);
 ```javascript
 // Set the visualization parameters
 var visParams = {
-    bands: ['SR_B6_median','SR_B5_median','SR_B4_median'],
-    gain: [0.08,0.06,0.2]
+    bands: ['SR_B6_median', 'SR_B5_median', 'SR_B4_median'], // Specify the bands to be used (e.g., bands for RGB visualization)
+    gain: [0.08, 0.06, 0.2]  // Set the gain values for each band to adjust contrast
 };
 
-// Add image to map
+// Add the mosaic image to the map
 Map.addLayer(mosaic, visParams, 'Mosaic');
 
-// Zoom into the image
+// Zoom into the image (adjust the zoom level to 9)
 Map.centerObject(mosaic, 9);
+
 ```
 ![load image](./Assets/load-image.png)
 [Link](https://code.earthengine.google.com/f4fd395fee6b2e8e8d1cac0718d62f3f)
