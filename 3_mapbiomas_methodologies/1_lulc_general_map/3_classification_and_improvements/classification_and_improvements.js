@@ -106,28 +106,36 @@ Map.addLayer(training_samples_stable.filter(ee.Filter.eq('class', 5)), { color: 
  * @param {number} n_points - Number of points to generate.
  * @returns {ee.FeatureCollection} FeatureCollection of points with class attribute.
  */
-var generatePoints = function (polygons, n_points) {
+var generate_points = function (polygons, n_points) {
+    // Generate N random points inside the polygons
     var points = ee.FeatureCollection.randomPoints(polygons, n_points);
-    var class_value = polygons.first().get('class');
+
+    // Get the class value property
+    var class_value = polygons.first().get('classId');
+
+    // Assign the class value to each point
     points = points.map(function (point) {
-        return point.set('class', class_value);
+        return point.set('classId', class_value);
     });
+
     return points;
 };
 
 // Generate additional training samples by random points.
-var class_1 = generatePoints(class_1_polygons, 50);
-var class_2 = generatePoints(class_2_polygons, 30);
-var class_3 = generatePoints(class_3_polygons, 50);
-var class_4 = generatePoints(class_4_polygons, 20);
-var class_5 = generatePoints(class_5_polygons, 20);
+var class_1 = generate_points(class_1_polygons, 50);
+var class_2 = generate_points(class_2_polygons, 30);
+var class_3 = generate_points(class_3_polygons, 50);
+var class_4 = generate_points(class_4_polygons, 20);
+var class_5 = generate_points(class_5_polygons, 20);
+var class_6 = generate_points(class_6_polygons, 20);
 
 // Merge all additional samples.
 var training_samples_aditional = class_1
     .merge(class_2)
     .merge(class_3)
     .merge(class_4)
-    .merge(class_5);
+    .merge(class_5)
+    .merge(class_6);
 
 // Visualize additional training samples.
 Map.addLayer(training_samples_aditional.filter(ee.Filter.eq('class', 1)), { color: '#0ddf06' }, 'Class 1 additional', false);
