@@ -17,9 +17,9 @@ In this step, we will manually collect samples for the classification process. U
 ### Create a feature collection
 
 
-In this example, we will classify three land cover classes: `vegetation`, `notVegetation`, and `water`. To achieve this, we need to collect samples for each class. Using the shape editing tool in the code editor ![edit-tool](./Assets/edit-tool.png), we will create three sets of polygons and import them as a FeatureCollection. Each set of geometries will also be assigned a name. 
+In this example, we will classify three land cover classes: `forest`, `wetland`, `grassland`, `agriculture`, `non vegetated area` and `water`. To achieve this, we need to collect samples for each class. Using the shape editing tool in the code editor ![edit-tool](./Assets/edit-tool.png), we will create six sets of polygons and import them as a FeatureCollection. Each set of geometries will also be assigned a name. 
 
-The script is designed to accept the following class names: `vegetation`, `notVegetation`, and `water`. For each category, a property called class will be added, with values of 1, 2, or 3 corresponding to vegetation, notVegetation, and water, respectively. You can assign a reference color to each class. See the figure below:
+The script is designed to accept the following class names: `forest`, `wetland`, `grassland`, `agriculture`, `non vegetated area` and `water`. For each category, a property called `class_id` will be added, with values of 3, 11, 12, 21, 25 and 33 corresponding to forest, wetland, grassland, agriculture, non vegetated area and water respectively. You can assign a reference color to each class. See the figure below:
 
 ## Script Sections Explanation
 
