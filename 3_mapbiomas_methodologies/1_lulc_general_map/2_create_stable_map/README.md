@@ -217,22 +217,23 @@ Once validated, export the stable map to your Earth Engine asset.
 
 ```javascript
 // ========================
-// Export (Commented Out)
+// Export to Asset
 // ========================
 
 var stable_name = territory_name + '-stable-map-' + output_version;
 
 Export.image.toAsset({
-  image: stable,
-  description: stable_name,
-  assetId: output_asset + '/' + stable_name,
-  scale: 30,
-  pyramidingPolicy: {
-    '.default': 'sample'
-  },
-  maxPixels: 1e13,
-  region: region_limit
+    image: stable,
+    description: stable_name,
+    assetId: output_asset + '/' + stable_name,
+    scale: 30,
+    pyramidingPolicy: {
+        '.default': 'sample'
+    },
+    maxPixels: 1e13,
+    region: region_limit
 });
+
 ```
 
 > **Caution:** You need to define `region_limit` properly with the boundary geometry.

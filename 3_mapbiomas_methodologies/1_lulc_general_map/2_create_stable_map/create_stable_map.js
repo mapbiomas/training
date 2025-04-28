@@ -141,21 +141,19 @@ Map.addLayer(stable, {
 
 
 // ========================
-// Export to Asset (Optional)
+// Export to Asset
 // ========================
 
-// Define the export task.
-// Remember to define the `region_limit` variable before running the export!
-// var stable_name = territory_name + '-stable-map-' + output_version;
+var stable_name = territory_name + '-stable-map-' + output_version;
 
-// Export.image.toAsset({
-//     image: stable,
-//     description: stable_name,
-//     assetId: output_asset + '/' + stable_name,
-//     scale: 30,
-//     pyramidingPolicy: {
-//         '.default': 'sample'
-//     },
-//     maxPixels: 1e13,
-//     region: region_limit // <-- Define region_limit as the geometry of Suriname!
-// });
+Export.image.toAsset({
+    image: stable,
+    description: stable_name,
+    assetId: output_asset + '/' + stable_name,
+    scale: 30,
+    pyramidingPolicy: {
+        '.default': 'sample'
+    },
+    maxPixels: 1e13,
+    region: region_limit
+});
