@@ -1,12 +1,21 @@
 # Classification and Improvements
 
-This script classifies annual land cover using a Random Forest model in Google Earth Engine. It is divided into several sections to guide beginner users. All code blocks retain original comments and docstrings.
+This document explains the structure and logic of the land cover classification script using Google Earth Engine. Each section includes the code with detailed beginner-friendly explanations.
 
 ---
 
-## 1. Initial Configuration
+## Initial Configuration
 
-Set up variables that define the territory, asset paths, processing years, feature space, and sample sizes. These settings are essential for linking to correct assets and defining parameters for model training.
+This section defines the core settings required for the classification. All variables set here control later processes.
+
+- **Territory Name**: Identifies the country or region. Must match exactly with training sample metadata.
+- **Asset Paths**: Specify the locations of mosaics, regions shapefile, stable maps, and output folders.
+- **Training Sample Naming Pattern**: Defines how exported training samples will be named.
+- **Versioning and Collection IDs**: Important for keeping track of dataset versions.
+- **Feature Space**: List of spectral and terrain variables extracted from mosaics for classification.
+- **Year Range**: Years to be processed.
+- **Sampling Strategy**: Number of random samples per class.
+- **Visualization Palette**: Color representation for each land cover class.
 
 ```javascript
 // ========================
@@ -21,21 +30,26 @@ var territory_name = 'SURINAME';
 
 // Folder containing the improved training samples.
 // Ensure the folder name matches the IMPROVEMENT folder used for the additional training samples.
-var trained_samples_folder = 'projects/mapbiomas-suriname/assets/LAND-COVER/TRAINING/SAMPLES/IMPROVEMENT-1';
+var trained_samples_folder = 'projects/mapbiomas-suriname/assets/LAND-COVER/COLLECTION-1/TRAINING/SAMPLES/IMPROVEMENT-1';
 
 // Annual mosaics for the territory.
-var mosaics_asset = 'projects/mapbiomas-mosaics/assets/SURINAME/mosaics-1';
+var mosaics_asset = 'projects/mapbiomas-mosaics/assets/LANDSAT/LULC/SURINAME/mosaics-1';
+
+// Path to the regions shapefile.
+var regions_asset = 'projects/mapbiomas-suriname/assets/suriname_classification_regions';
 
 // Stable map asset (reference classification map).
-var stable_asset = 'projects/mapbiomas-suriname/assets/LAND-COVER/TRAINING/stable';
+var stable_asset = 'projects/mapbiomas-suriname/assets/LAND-COVER/COLLECTION-1/TRAINING/stable';
 
 // Output folder for the final stable classification map.
-var output_asset = 'projects/mapbiomas-suriname/assets/LAND-COVER/TRAINING/classification';
+var output_asset = 'projects/mapbiomas-suriname/assets/LAND-COVER/COLLECTION-1/TRAINING/classification';
 
 // Pattern for naming the exported trained samples.
 // Use '{year}' as a placeholder to be replaced with each processing year.
-// Example: 'suriname_training_samples_2000_1' for the year 2000.
-var output_trained_samples_pattern = 'suriname_training_samples_{year}_1';
+// Use '{version}' as a placeholder for the version number.
+// Use '{region_id}' to specify the region ID.
+// Example: 'suriname_training_samples_1_2000_1' for the year 2000, region id 1 and version 1.
+var output_trained_samples_pattern = 'suriname_training_samples_{region_id}_{year}_{version}';
 
 // Define stable map version.
 var stable_version = '1';
@@ -63,33 +77,53 @@ var feature_space = [
 ];
 
 // Define start and end years for mosaic filtering and visualization.
-var startYear = 2000;
-var endYear = 2024;
+var start_year = 2000;
+var end_year = 2023;
 
 // Number of random samples per class for the stable map.
 var n_samples_per_class = [
-    { 'class_id': 1, 'n_samples': 500 },
-    { 'class_id': 2, 'n_samples': 300 },
-    { 'class_id': 3, 'n_samples': 500 },
-    { 'class_id': 4, 'n_samples': 100 },
-    { 'class_id': 5, 'n_samples': 100 }
+    { 'class_id': 3,  'n_samples': 500 }, // forest
+    { 'class_id': 11, 'n_samples': 300 }, // wetland 
+    { 'class_id': 12, 'n_samples': 500 }, // grassland 
+    { 'class_id': 21, 'n_samples': 100 }, // mosaic_of_uses 
+    { 'class_id': 25, 'n_samples': 100 }, // non_vegetated_area 
+    { 'class_id': 33, 'n_samples': 50 },  // water
+];
+
+// Color palette for each land cover class
+var palette = [
+    '#1f8d49', // forest
+    '#519799', // wetland
+    '#d6bc74', // grassland
+    '#ffefc3', // mosaic_of_uses
+    '#db4d4f', // non_vegetated_area
+    '#2532e4'  // water
 ];
 ```
 
 ---
 
-## 2. Load Data
+## Load Data
 
-Load mosaics and stable maps needed for training and classification. The mosaics provide spectral information for each year.
+Load and prepare the input datasets:
+
+- **Regions shapefile**: Defines administrative or classification boundaries.
+- **Mosaics**: Time series satellite imagery composites.
+- **Stable Map**: Reference land cover classification for generating training samples.
+
+**Important**: `region_id` must be defined before this block to select the correct region.
 
 ```javascript
+// Load Classification Regions
+var regions = ee.FeatureCollection(regions_asset);
+var selected_region = regions.filter(ee.Filter.eq("region_id", region_id));
+
 // Load mosaics for the territory.
-var mosaics = ee.ImageCollection(mosaics_asset)
-    .filter(ee.Filter.eq('territory', territory_name));
+var mosaics = ee.ImageCollection(mosaics_asset);
 
 // Load start and end mosaics.
-var startMosaic = mosaics.filter(ee.Filter.eq('year', startYear)).mosaic();
-var endMosaic = mosaics.filter(ee.Filter.eq('year', endYear)).mosaic();
+var start_mosaic = mosaics.filter(ee.Filter.eq('year', start_year)).mosaic();
+var end_mosaic = mosaics.filter(ee.Filter.eq('year', end_year)).mosaic();
 
 // Load the stable classification map.
 var stable = ee.ImageCollection(stable_asset)
@@ -99,13 +133,15 @@ var stable = ee.ImageCollection(stable_asset)
 
 ---
 
-## 3. Generate Training Samples
+## Generate Training Samples
 
-Create training samples from the stable map and additional manually defined polygons. Samples are necessary for model learning.
+### Stable Sampling
 
-### 3.1 Stable Samples
+Perform stratified random sampling:
 
-Use stratified random sampling to generate a representative set of samples across classes.
+- **class_values_stable** and **class_points_stable** are created from the user-defined list.
+- Samples are distributed proportionally across classes.
+- Ensures that even rare classes are represented.
 
 ```javascript
 // Prepare class values and number of points for stratified sampling.
@@ -116,149 +152,231 @@ var class_points_stable = n_samples_per_class.map(function (item) { return item.
 var training_samples_stable = stable.stratifiedSample({
     numPoints: 0,
     classBand: 'class',
-    region: region_limit, // Must be defined before this block.
+    region: selected_region,
     classValues: class_values_stable,
     classPoints: class_points_stable,
     scale: 30,
     seed: 1,
     geometries: true
 });
+
+// Visualize the training samples per class.
+Map.addLayer(training_samples_stable.filter(ee.Filter.eq('class_id', 3)), { color: '#1f8d49' }, 'forest', false);
+Map.addLayer(training_samples_stable.filter(ee.Filter.eq('class_id', 11)), { color: '#519799' }, 'wetland', false);
+Map.addLayer(training_samples_stable.filter(ee.Filter.eq('class_id', 12)), { color: '#d6bc74' }, 'grassland', false);
+Map.addLayer(training_samples_stable.filter(ee.Filter.eq('class_id', 21)), { color: '#ffefc3' }, 'mosaic_of_uses', false);
+Map.addLayer(training_samples_stable.filter(ee.Filter.eq('class_id', 25)), { color: '#db4d4f' }, 'non_vegetated_area', false);
+Map.addLayer(training_samples_stable.filter(ee.Filter.eq('class_id', 33)), { color: '#2532e4' }, 'water', false);
 ```
 
-### 3.2 Additional Samples
+### Additional Samples
 
-Generate extra samples using predefined polygons, ensuring better spatial coverage and complementing the stable map.
+Generate extra training samples manually to complement areas where stable map may be inaccurate.
+
+- Random points are generated inside manually drawn polygons (e.g., forest, wetland).
+- Each point inherits the class value from the polygon.
 
 ```javascript
 /**
- * Generates random points inside polygons and assigns class labels.
+ * @description Generates random points inside polygons and assigns class labels.
+ * @param {ee.FeatureCollection} polygons - The polygons where points will be generated.
+ * @param {number} n_points - Number of points to generate.
+ * @returns {ee.FeatureCollection} FeatureCollection of points with class attribute.
  */
-var generatePoints = function (polygons, n_points) {
+var generate_points = function (polygons, n_points) {
+    // Generate N random points inside the polygons
     var points = ee.FeatureCollection.randomPoints(polygons, n_points);
-    var class_value = polygons.first().get('class');
+
+    // Get the class value property
+    var class_value = polygons.first().get('classId');
+
+    // Assign the class value to each point
     points = points.map(function (point) {
-        return point.set('class', class_value);
+        return point.set('classId', class_value);
     });
+
     return points;
 };
 
-var class_1 = generatePoints(class_1_polygons, 50);
-var class_2 = generatePoints(class_2_polygons, 30);
-var class_3 = generatePoints(class_3_polygons, 50);
-var class_4 = generatePoints(class_4_polygons, 20);
-var class_5 = generatePoints(class_5_polygons, 20);
+// Generate additional training samples by random points.
+var forest_points = generate_points(forest, 50);
+var wetland_points = generate_points(wetland, 30);
+var grassland_points = generate_points(grassland, 50);
+var mosaic_of_uses_points = generate_points(mosaic_of_uses, 20);
+var non_vegetated_area_points = generate_points(non_vegetated_area, 20);
+var water_points = generate_points(water, 20);
 
-var training_samples_aditional = class_1
-    .merge(class_2)
-    .merge(class_3)
-    .merge(class_4)
-    .merge(class_5);
+// Merge all additional samples.
+var training_samples_additional = forest_points
+    .merge(wetland_points)
+    .merge(grassland_points)
+    .merge(mosaic_of_uses_points)
+    .merge(non_vegetated_area_points)
+    .merge(water_points);
+
+// Visualize additional training samples.
+Map.addLayer(training_samples_additional.filter(ee.Filter.eq('class_id', 3)), { color: '#1f8d49' }, 'forest additional', false);
+Map.addLayer(training_samples_additional.filter(ee.Filter.eq('class_id', 11)), { color: '#519799' }, 'wetland additional', false);
+Map.addLayer(training_samples_additional.filter(ee.Filter.eq('class_id', 12)), { color: '#d6bc74' }, 'grassland additional', false);
+Map.addLayer(training_samples_additional.filter(ee.Filter.eq('class_id', 21)), { color: '#ffefc3' }, 'mosaic_of_uses additional', false);
+Map.addLayer(training_samples_additional.filter(ee.Filter.eq('class_id', 25)), { color: '#db4d4f' }, 'non_vegetated_area additional', false);
+Map.addLayer(training_samples_additional.filter(ee.Filter.eq('class_id', 33)), { color: '#2532e4' }, 'water additional', false);
+
+print('training_samples_additional', training_samples_additional);
 
 // Merge stable and additional training samples.
-var training_samples = training_samples_stable.merge(training_samples_aditional);
+var training_samples = training_samples_stable.merge(training_samples_additional);
+print('training_samples', training_samples);
 ```
+
+**Best Practice**: Merge both stable and additional samples to enrich the classifier's training dataset.
 
 ---
 
-## 4. Classification Setup
+## Classification Setup
 
-Initialize the Random Forest model and prepare the classification function.
+Prepare the Random Forest model:
+
+- **Random Forest** is chosen due to its robustness and ease of use.
+- 50 trees are used as a balance between speed and accuracy.
+
+Define a classification function for each year:
+
+- Reduce the mosaic over training points.
+- Train the classifier using reduced features.
+- Classify the entire mosaic image.
+- Return classified images and associated training samples.
 
 ```javascript
 // Set up the Random Forest classifier.
 var classifier = ee.Classifier.smileRandomForest({
     numberOfTrees: 50
 });
+```
 
+---
+
+## Classification Execution
+
+Apply the classification function to all years:
+
+- Results are stacked into a multi-band image.
+- Each band represents one year.
+- Metadata attributes are attached for traceability.
+
+```javascript
 /**
- * Classifies a given year using the corresponding mosaic and training samples.
+ * @description Classifies a given year using the corresponding mosaic and training samples.
+ * @param {number} year - The year to classify.
+ * @returns {Object} An object with the classified image, year, and training samples.
  */
 var classifyRandomForest = function (year) {
 
+    // Filter mosaics for the given year and create a single mosaic
     var mosaic_year = mosaics.filter(ee.Filter.eq('year', year)).mosaic();
 
+    // Reduce regions of the training samples using the mosaic of the current year
     var trained_samples_year = mosaic_year.reduceRegions({
-        collection: training_samples,
-        reducer: ee.Reducer.first(),
-        scale: 30
-    }).filter(ee.Filter.notNull(['red_amp']));
-
-    var trained_classifier = classifier.train({
-        features: trained_samples_year,
-        classProperty: 'class',
-        inputProperties: feature_space
+        collection: training_samples,    // Training samples collection
+        reducer: ee.Reducer.first(),      // Extracts the first value of the bands for each sample
+        scale: 30                         // Working scale (30 meters)
     });
 
+    // Filter out samples that have null values in the feature space
+    trained_samples_year = trained_samples_year.filter(ee.Filter.notNull(['red_amp']));
+
+    // Train the Random Forest classifier using the filtered samples
+    var trained_classifier = classifier.train({
+        features: trained_samples_year,   // Samples used for training
+        classProperty: 'class_id',           // Property name for the class label
+        inputProperties: feature_space    // List of feature attributes to use
+    });
+
+    // Classify the mosaic of the current year using the trained classifier
     var classification = mosaic_year
         .classify(trained_classifier)
-        .rename('classification_' + year);
+        .rename('classification_' + year); // Rename the output band
 
+    // Return an object containing the classification, year, and trained samples
     return {
         classification: classification,
         year: year,
         trained_samples: trained_samples_year
     };
 };
-```
 
----
 
-## 5. Classification Execution
-
-Apply the classification function across all target years and build a stacked classified image.
-
-```javascript
+// Classify all years.
 var classified_object_stack_list = years.map(classifyRandomForest);
 
+// Combine all classified images into a multi-band image.
 var classified_stack = ee.Image(classified_object_stack_list.map(function (obj) {
     return obj.classification;
 }));
 
+// Set metadata.
 classified_stack = classified_stack
     .set('collection_id', collection_id)
     .set('version', output_version)
     .set('territory', territory_name);
 ```
 
+**Note**: You can monitor each year's classification separately in the GEE Map interface.
+
 ---
 
-## 6. Exporting Results
+## Exporting Results
 
-Export each year's classified map and training samples, followed by the final multi-band image.
+### Export Training Samples
+
+- For each year, export the set of samples used.
+- Helps future retraining, auditing, or validation.
+
+### Export Final Classification Stack
+
+- Export all classified years as one multiband image.
+- Assets are named systematically using region ID and version.
 
 ```javascript
+// Add the classified image and export the trained samples for each year
 years.forEach(function (year) {
 
+    // Add the classified image for the current year to the map.
     Map.addLayer(
         classified_stack.select('classification_' + year),
         {
             min: 1,
-            max: 5,
-            palette: ['#0ddf06', '#98ff00', '#d94fff', '#ff2d1c', '#00ffff'],
+            max: 6,
+            palette: palette,
             format: 'png'
         },
         'classification_' + year,
-        false
+        false // Initially not visible
     );
 
+    // Get the trained samples object for the current year from the classified object stack
     var trained_samples_year = classified_object_stack_list.filter(
         function (obj) {
-            return obj.year === year;
+            return obj.year === year; // Match the year
         }
-    )[0].trained_samples;
+    )[0].trained_samples; // Get the 'trained_samples' property
 
+    // Generate the output name for the trained samples asset
     var output_trained_samples_name = output_trained_samples_pattern.replace('{year}', year);
 
+    // Export the training samples to an asset
     Export.table.toAsset({
-        collection: trained_samples_year,
-        description: output_trained_samples_name,
-        assetId: output_asset + '/' + output_trained_samples_name,
+        collection: trained_samples_year,          // FeatureCollection to export
+        description: output_trained_samples_name,  // Task description
+        assetId: output_asset + '/' + output_trained_samples_name, // Destination asset path
     });
 
 });
 
 // Export final classified multi-band image.
-var classification_name = territory_name + '-REGION-ID-' + output_version;
+var classification_name = territory_name + '_{region_id}_{version}'
+    .replace('{version}', output_version)
+    .replace('{region_id}', region_id);
 
 Export.image.toAsset({
     image: classified_stack,
@@ -269,5 +387,9 @@ Export.image.toAsset({
     maxPixels: 1e13
 });
 ```
+
+**Attention**:
+- Exports may require several hours depending on the territory size.
+- Manage Earth Engine tasks queue to avoid overload.
 
 ---

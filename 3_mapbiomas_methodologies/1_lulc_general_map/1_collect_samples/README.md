@@ -100,9 +100,11 @@ var class_ids = [
 Loads the regions and mosaics from Earth Engine assets. Filters the classification regions by the selected region ID.
 
 ```javascript
+// Load Classification Regions
 var regions = ee.FeatureCollection(regions_asset);
 var selected_region = regions.filter(ee.Filter.eq("region_id", region_id));
 
+// Load Mosaics
 var mosaics = ee.ImageCollection(mosaics_asset);
 ```
 
@@ -121,7 +123,32 @@ var palette = [
 ];
 ```
 
-### 4. Random Point Generation Function
+### 4. Load and Visualize Start and End Mosaics
+
+Loads mosaics for the first and last years and displays them on the map for context.
+
+```javascript
+// Define the visualization parameters for the mosaics
+var vis_params = {
+    bands: ['swir1_median', 'nir_median', 'red_median'],
+    gain: [0.08, 0.06, 0.2]
+};
+
+// Load start and end mosaics.
+var start_mosaic = mosaics.filter(ee.Filter.eq('year', start_year))
+    .mosaic()
+    .clip(selected_region);
+
+var end_mosaic = mosaics.filter(ee.Filter.eq('year', end_year))
+    .mosaic()
+    .clip(selected_region);
+
+// Add the start and end mosaics to the map
+Map.addLayer(start_mosaic, vis_params, 'Mosaic ' + start_year.toString());
+Map.addLayer(end_mosaic, vis_params, 'Mosaic ' + end_year.toString());
+```
+
+### 5. Random Point Generation Function
 
 This function creates a specified number of random points within a given polygon collection and assigns the corresponding land cover class ID to each point.
 
@@ -133,42 +160,50 @@ This function creates a specified number of random points within a given polygon
  * @returns {ee.FeatureCollection} FeatureCollection of points with class attribute.
  */
 var generate_points = function (polygons, n_points) {
+    // Generate N random points inside the polygons
     var points = ee.FeatureCollection.randomPoints(polygons, n_points);
-    var class_value = polygons.first().get('classId');
+
+    // Get the class value property
+    var class_value = polygons.first().get('class_id');
+
+    // Assign the class value to each point
     points = points.map(function (point) {
         return point.set('class_id', class_value);
     });
+
     return points;
 };
 ```
 
-### 5. Generate Training Samples
+### 6. Generate Training Samples
 
 Generates additional training samples for each land cover class by calling `generate_points` for the corresponding class mask.
 
 ```javascript
+// Generate additional training samples by random points.
 var forest_points = generate_points(forest, 50);
 var wetland_points = generate_points(wetland, 30);
 var grassland_points = generate_points(grassland, 50);
-var agriculture_points = generate_points(agriculture, 20);
+var mosaic_of_uses_points = generate_points(mosaic_of_uses, 20);
 var non_vegetated_area_points = generate_points(non_vegetated_area, 20);
 var water_points = generate_points(water, 20);
 ```
 
-### 6. Merge All Training Samples
+### 7. Merge All Training Samples
 
 Combines all the generated points into a single FeatureCollection to be used for sampling.
 
 ```javascript
+// Merge all additional samples.
 var training_samples = forest_points
     .merge(wetland_points)
     .merge(grassland_points)
-    .merge(agriculture_points)
+    .merge(mosaic_of_uses_points)
     .merge(non_vegetated_area_points)
     .merge(water_points);
 ```
 
-### 7. Visualize Training Samples
+### 8. Visualize Training Samples
 
 Adds each category of generated training points to the map with the corresponding color for visual verification.
 
@@ -181,23 +216,6 @@ Map.addLayer(training_samples.filter(ee.Filter.eq('class_id', 21)), { color: '#f
 Map.addLayer(training_samples.filter(ee.Filter.eq('class_id', 33)), { color: '#2532e4' }, 'water_points', false);
 ```
 
-### 8. Load and Visualize Start and End Mosaics
-
-Loads mosaics for the first and last years and displays them on the map for context.
-
-```javascript
-var start_mosaic = mosaics.filter(ee.Filter.eq('year', start_year))
-    .mosaic()
-    .clip(selected_region);
-
-var end_mosaic = mosaics.filter(ee.Filter.eq('year', end_year))
-    .mosaic()
-    .clip(selected_region);
-
-Map.addLayer(start_mosaic, vis_params, 'Mosaic ' + start_year.toString());
-Map.addLayer(end_mosaic, vis_params, 'Mosaic ' + end_year.toString());
-```
-
 ### 9. Iterate Over Years and Export Samples
 
 For each year:
@@ -206,11 +224,15 @@ For each year:
 - Exports the sampled points to the specified Earth Engine asset folder.
 
 ```javascript
+// Iterate over Years
 years.forEach(function (year) {
+
+    // Filter and prepare the mosaic for the current year
     var mosaic_year = mosaics.filter(ee.Filter.eq('year', year))
         .mosaic()
         .clip(selected_region);
 
+    // Sample mosaic with training points
     var trained_samples = mosaic_year.sampleRegions({
         collection: training_samples,
         properties: ['class_id'],
@@ -218,16 +240,21 @@ years.forEach(function (year) {
         geometries: true
     });
 
+    print('trained samples', trained_samples);
+
+    // Generate the output name for the trained samples asset
     var output_trained_samples_name = output_trained_samples_pattern
         .replace('{region_id}', region_id)
         .replace('{year}', year)
         .replace('{version}', output_version);
 
+    // Export the trained samples to an asset
     Export.table.toAsset({
         collection: trained_samples,
         description: output_trained_samples_name,
         assetId: output_asset + '/' + output_trained_samples_name
     });
+    
 });
 ```
 ---

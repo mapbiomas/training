@@ -69,52 +69,6 @@ var palette = [
     '#2532e4'  // water
 ];
 
-
-/**
- * @description Generates random points inside polygons and assigns class labels.
- * @param {ee.FeatureCollection} polygons - The polygons where points will be generated.
- * @param {number} n_points - Number of points to generate.
- * @returns {ee.FeatureCollection} FeatureCollection of points with class attribute.
- */
-var generate_points = function (polygons, n_points) {
-    // Generate N random points inside the polygons
-    var points = ee.FeatureCollection.randomPoints(polygons, n_points);
-
-    // Get the class value property
-    var class_value = polygons.first().get('classId');
-
-    // Assign the class value to each point
-    points = points.map(function (point) {
-        return point.set('class_id', class_value);
-    });
-
-    return points;
-};
-
-// Generate additional training samples by random points.
-var forest_points = generate_points(forest, 50);
-var wetland_points = generate_points(wetland, 30);
-var grassland_points = generate_points(grassland, 50);
-var agriculture_points = generate_points(agriculture, 20);
-var non_vegetated_area_points = generate_points(non_vegetated_area, 20);
-var water_points = generate_points(water, 20);
-
-// Merge all additional samples.
-var training_samples = forest_points
-    .merge(wetland_points)
-    .merge(grassland_points)
-    .merge(agriculture_points)
-    .merge(non_vegetated_area_points)
-    .merge(water_points);
-
-// Visualize additional training samples.
-Map.addLayer(training_samples.filter(ee.Filter.eq('class_id', 3)), { color: '#1f8d49' }, 'forest_points', false);
-Map.addLayer(training_samples.filter(ee.Filter.eq('class_id', 11)), { color: '#519799' }, 'wetland_points', false);
-Map.addLayer(training_samples.filter(ee.Filter.eq('class_id', 12)), { color: '#d6bc74' }, 'grassland_points', false);
-Map.addLayer(training_samples.filter(ee.Filter.eq('class_id', 25)), { color: '#db4d4f' }, 'non_vegetated_area_points', false);
-Map.addLayer(training_samples.filter(ee.Filter.eq('class_id', 21)), { color: '#ffefc3' }, 'mosaic_of_uses', false);
-Map.addLayer(training_samples.filter(ee.Filter.eq('class_id', 33)), { color: '#2532e4' }, 'water_points', false);
-
 // Define the visualization parameters for the mosaics
 var vis_params = {
     bands: ['swir1_median', 'nir_median', 'red_median'],
@@ -133,6 +87,51 @@ var end_mosaic = mosaics.filter(ee.Filter.eq('year', end_year))
 // Add the start and end mosaics to the map
 Map.addLayer(start_mosaic, vis_params, 'Mosaic ' + start_year.toString());
 Map.addLayer(end_mosaic, vis_params, 'Mosaic ' + end_year.toString());
+
+/**
+ * @description Generates random points inside polygons and assigns class labels.
+ * @param {ee.FeatureCollection} polygons - The polygons where points will be generated.
+ * @param {number} n_points - Number of points to generate.
+ * @returns {ee.FeatureCollection} FeatureCollection of points with class attribute.
+ */
+var generate_points = function (polygons, n_points) {
+    // Generate N random points inside the polygons
+    var points = ee.FeatureCollection.randomPoints(polygons, n_points);
+
+    // Get the class value property
+    var class_value = polygons.first().get('class_id');
+
+    // Assign the class value to each point
+    points = points.map(function (point) {
+        return point.set('class_id', class_value);
+    });
+
+    return points;
+};
+
+// Generate additional training samples by random points.
+var forest_points = generate_points(forest, 50);
+var wetland_points = generate_points(wetland, 30);
+var grassland_points = generate_points(grassland, 50);
+var mosaic_of_uses_points = generate_points(mosaic_of_uses, 20);
+var non_vegetated_area_points = generate_points(non_vegetated_area, 20);
+var water_points = generate_points(water, 20);
+
+// Merge all additional samples.
+var training_samples = forest_points
+    .merge(wetland_points)
+    .merge(grassland_points)
+    .merge(mosaic_of_uses_points)
+    .merge(non_vegetated_area_points)
+    .merge(water_points);
+
+// Visualize additional training samples.
+Map.addLayer(training_samples.filter(ee.Filter.eq('class_id', 3)), { color: '#1f8d49' }, 'forest_points', false);
+Map.addLayer(training_samples.filter(ee.Filter.eq('class_id', 11)), { color: '#519799' }, 'wetland_points', false);
+Map.addLayer(training_samples.filter(ee.Filter.eq('class_id', 12)), { color: '#d6bc74' }, 'grassland_points', false);
+Map.addLayer(training_samples.filter(ee.Filter.eq('class_id', 25)), { color: '#db4d4f' }, 'non_vegetated_area_points', false);
+Map.addLayer(training_samples.filter(ee.Filter.eq('class_id', 21)), { color: '#ffefc3' }, 'mosaic_of_uses', false);
+Map.addLayer(training_samples.filter(ee.Filter.eq('class_id', 33)), { color: '#2532e4' }, 'water_points', false);
 
 // Iterate over Years
 years.forEach(function (year) {

@@ -10,21 +10,26 @@ var territory_name = 'SURINAME';
 
 // Folder containing the improved training samples.
 // Ensure the folder name matches the IMPROVEMENT folder used for the additional training samples.
-var trained_samples_folder = 'projects/mapbiomas-suriname/assets/LAND-COVER/TRAINING/SAMPLES/IMPROVEMENT-1';
+var trained_samples_folder = 'projects/mapbiomas-suriname/assets/LAND-COVER/COLLECTION-1/TRAINING/SAMPLES/IMPROVEMENT-1';
 
 // Annual mosaics for the territory.
-var mosaics_asset = 'projects/mapbiomas-mosaics/assets/SURINAME/mosaics-1';
+var mosaics_asset = 'projects/mapbiomas-mosaics/assets/LANDSAT/LULC/SURINAME/mosaics-1';
+
+// Path to the regions shapefile.
+var regions_asset = 'projects/mapbiomas-suriname/assets/suriname_classification_regions';
 
 // Stable map asset (reference classification map).
-var stable_asset = 'projects/mapbiomas-suriname/assets/LAND-COVER/TRAINING/stable';
+var stable_asset = 'projects/mapbiomas-suriname/assets/LAND-COVER/COLLECTION-1/TRAINING/stable';
 
 // Output folder for the final stable classification map.
-var output_asset = 'projects/mapbiomas-suriname/assets/LAND-COVER/TRAINING/classification';
+var output_asset = 'projects/mapbiomas-suriname/assets/LAND-COVER/COLLECTION-1/TRAINING/classification';
 
 // Pattern for naming the exported trained samples.
 // Use '{year}' as a placeholder to be replaced with each processing year.
-// Example: 'suriname_training_samples_2000_1' for the year 2000.
-var output_trained_samples_pattern = 'suriname_training_samples_{year}_1';
+// Use '{version}' as a placeholder for the version number.
+// Use '{region_id}' to specify the region ID.
+// Example: 'suriname_training_samples_1_2000_1' for the year 2000, region id 1 and version 1.
+var output_trained_samples_pattern = 'suriname_training_samples_{region_id}_{year}_{version}';
 
 // Define stable map version.
 var stable_version = '1';
@@ -52,25 +57,39 @@ var feature_space = [
 ];
 
 // Define start and end years for mosaic filtering and visualization.
-var startYear = 2000;
-var endYear = 2024;
+var start_year = 2000;
+var end_year = 2023;
 
 // Number of random samples per class for the stable map.
 var n_samples_per_class = [
-    { 'class_id': 1, 'n_samples': 500 },
-    { 'class_id': 2, 'n_samples': 300 },
-    { 'class_id': 3, 'n_samples': 500 },
-    { 'class_id': 4, 'n_samples': 100 },
-    { 'class_id': 5, 'n_samples': 100 }
+    { 'class_id': 3,  'n_samples': 500 }, // forest
+    { 'class_id': 11, 'n_samples': 300 }, // wetland 
+    { 'class_id': 12, 'n_samples': 500 }, // grassland 
+    { 'class_id': 21, 'n_samples': 100 }, // mosaic_of_uses 
+    { 'class_id': 25, 'n_samples': 100 }, // non_vegetated_area 
+    { 'class_id': 33, 'n_samples': 50 },  // water
 ];
 
+// Color palette for each land cover class
+var palette = [
+    '#1f8d49', // forest
+    '#519799', // wetland
+    '#d6bc74', // grassland
+    '#ffefc3', // mosaic_of_uses
+    '#db4d4f', // non_vegetated_area
+    '#2532e4'  // water
+];
+
+// Load Classification Regions
+var regions = ee.FeatureCollection(regions_asset);
+var selected_region = regions.filter(ee.Filter.eq("region_id", region_id));
+
 // Load mosaics for the territory.
-var mosaics = ee.ImageCollection(mosaics_asset)
-    .filter(ee.Filter.eq('territory', territory_name));
+var mosaics = ee.ImageCollection(mosaics_asset);
 
 // Load start and end mosaics.
-var startMosaic = mosaics.filter(ee.Filter.eq('year', startYear)).mosaic();
-var endMosaic = mosaics.filter(ee.Filter.eq('year', endYear)).mosaic();
+var start_mosaic = mosaics.filter(ee.Filter.eq('year', start_year)).mosaic();
+var end_mosaic = mosaics.filter(ee.Filter.eq('year', end_year)).mosaic();
 
 // Load the stable classification map.
 var stable = ee.ImageCollection(stable_asset)
@@ -85,7 +104,7 @@ var class_points_stable = n_samples_per_class.map(function (item) { return item.
 var training_samples_stable = stable.stratifiedSample({
     numPoints: 0,
     classBand: 'class',
-    region: region_limit, // **Note:** Ensure `region_limit` is defined somewhere before this block!
+    region: selected_region,
     classValues: class_values_stable,
     classPoints: class_points_stable,
     scale: 30,
@@ -94,11 +113,12 @@ var training_samples_stable = stable.stratifiedSample({
 });
 
 // Visualize the training samples per class.
-Map.addLayer(training_samples_stable.filter(ee.Filter.eq('class', 1)), { color: '#0ddf06' }, 'Class 1', false);
-Map.addLayer(training_samples_stable.filter(ee.Filter.eq('class', 2)), { color: '#98ff00' }, 'Class 2', false);
-Map.addLayer(training_samples_stable.filter(ee.Filter.eq('class', 3)), { color: '#d94fff' }, 'Class 3', false);
-Map.addLayer(training_samples_stable.filter(ee.Filter.eq('class', 4)), { color: '#ff2d1c' }, 'Class 4', false);
-Map.addLayer(training_samples_stable.filter(ee.Filter.eq('class', 5)), { color: '#00ffff' }, 'Class 5', false);
+Map.addLayer(training_samples_stable.filter(ee.Filter.eq('class_id', 3)), { color: '#1f8d49' }, 'forest', false);
+Map.addLayer(training_samples_stable.filter(ee.Filter.eq('class_id', 11)), { color: '#519799' }, 'wetland', false);
+Map.addLayer(training_samples_stable.filter(ee.Filter.eq('class_id', 12)), { color: '#d6bc74' }, 'grassland', false);
+Map.addLayer(training_samples_stable.filter(ee.Filter.eq('class_id', 21)), { color: '#ffefc3' }, 'mosaic_of_uses', false);
+Map.addLayer(training_samples_stable.filter(ee.Filter.eq('class_id', 25)), { color: '#db4d4f' }, 'non_vegetated_area', false);
+Map.addLayer(training_samples_stable.filter(ee.Filter.eq('class_id', 33)), { color: '#2532e4' }, 'water', false);
 
 /**
  * @description Generates random points inside polygons and assigns class labels.
@@ -122,32 +142,33 @@ var generate_points = function (polygons, n_points) {
 };
 
 // Generate additional training samples by random points.
-var class_1 = generate_points(class_1_polygons, 50);
-var class_2 = generate_points(class_2_polygons, 30);
-var class_3 = generate_points(class_3_polygons, 50);
-var class_4 = generate_points(class_4_polygons, 20);
-var class_5 = generate_points(class_5_polygons, 20);
-var class_6 = generate_points(class_6_polygons, 20);
+var forest_points = generate_points(forest, 50);
+var wetland_points = generate_points(wetland, 30);
+var grassland_points = generate_points(grassland, 50);
+var mosaic_of_uses_points = generate_points(mosaic_of_uses, 20);
+var non_vegetated_area_points = generate_points(non_vegetated_area, 20);
+var water_points = generate_points(water, 20);
 
 // Merge all additional samples.
-var training_samples_aditional = class_1
-    .merge(class_2)
-    .merge(class_3)
-    .merge(class_4)
-    .merge(class_5)
-    .merge(class_6);
+var training_samples_additional = forest_points
+    .merge(wetland_points)
+    .merge(grassland_points)
+    .merge(mosaic_of_uses_points)
+    .merge(non_vegetated_area_points)
+    .merge(water_points);
 
 // Visualize additional training samples.
-Map.addLayer(training_samples_aditional.filter(ee.Filter.eq('class', 1)), { color: '#0ddf06' }, 'Class 1 additional', false);
-Map.addLayer(training_samples_aditional.filter(ee.Filter.eq('class', 2)), { color: '#98ff00' }, 'Class 2 additional', false);
-Map.addLayer(training_samples_aditional.filter(ee.Filter.eq('class', 3)), { color: '#d94fff' }, 'Class 3 additional', false);
-Map.addLayer(training_samples_aditional.filter(ee.Filter.eq('class', 4)), { color: '#ff2d1c' }, 'Class 4 additional', false);
-Map.addLayer(training_samples_aditional.filter(ee.Filter.eq('class', 5)), { color: '#00ffff' }, 'Class 5 additional', false);
+Map.addLayer(training_samples_additional.filter(ee.Filter.eq('class_id', 3)), { color: '#1f8d49' }, 'forest additional', false);
+Map.addLayer(training_samples_additional.filter(ee.Filter.eq('class_id', 11)), { color: '#519799' }, 'wetland additional', false);
+Map.addLayer(training_samples_additional.filter(ee.Filter.eq('class_id', 12)), { color: '#d6bc74' }, 'grassland additional', false);
+Map.addLayer(training_samples_additional.filter(ee.Filter.eq('class_id', 21)), { color: '#ffefc3' }, 'mosaic_of_uses additional', false);
+Map.addLayer(training_samples_additional.filter(ee.Filter.eq('class_id', 25)), { color: '#db4d4f' }, 'non_vegetated_area additional', false);
+Map.addLayer(training_samples_additional.filter(ee.Filter.eq('class_id', 33)), { color: '#2532e4' }, 'water additional', false);
 
-print('training_samples_aditional', training_samples_aditional);
+print('training_samples_additional', training_samples_additional);
 
 // Merge stable and additional training samples.
-var training_samples = training_samples_stable.merge(training_samples_aditional);
+var training_samples = training_samples_stable.merge(training_samples_additional);
 print('training_samples', training_samples);
 
 // =========================
@@ -182,7 +203,7 @@ var classifyRandomForest = function (year) {
     // Train the Random Forest classifier using the filtered samples
     var trained_classifier = classifier.train({
         features: trained_samples_year,   // Samples used for training
-        classProperty: 'class',           // Property name for the class label
+        classProperty: 'class_id',           // Property name for the class label
         inputProperties: feature_space    // List of feature attributes to use
     });
 
@@ -222,14 +243,8 @@ years.forEach(function (year) {
         classified_stack.select('classification_' + year),
         {
             min: 1,
-            max: 5,
-            palette: [
-                '#0ddf06', // Class 1
-                '#98ff00', // Class 2
-                '#d94fff', // Class 3
-                '#ff2d1c', // Class 4
-                '#00ffff'  // Class 5
-            ],
+            max: 6,
+            palette: palette,
             format: 'png'
         },
         'classification_' + year,
@@ -256,7 +271,9 @@ years.forEach(function (year) {
 });
 
 // Export final classified multi-band image.
-var classification_name = territory_name + '-REGION-ID-' + output_version;
+var classification_name = territory_name + '_{region_id}_{version}'
+    .replace('{version}', output_version)
+    .replace('{region_id}', region_id);
 
 Export.image.toAsset({
     image: classified_stack,
