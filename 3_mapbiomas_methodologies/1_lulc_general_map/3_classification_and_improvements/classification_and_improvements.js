@@ -284,7 +284,6 @@ years.forEach(function (year) {
         description: output_trained_samples_name,  // Task description
         assetId: output_asset + '/' + output_trained_samples_name, // Destination asset path
     });
-
 });
 
 // Export final classified multi-band image.
