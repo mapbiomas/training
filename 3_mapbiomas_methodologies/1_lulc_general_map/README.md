@@ -1,4 +1,4 @@
-# MapBiomas Methodologies
+# MapBiomas Methodologies - General Map
 
 ## About
 
