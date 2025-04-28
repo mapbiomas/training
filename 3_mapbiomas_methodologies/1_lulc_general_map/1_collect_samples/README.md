@@ -16,9 +16,9 @@ In this step, we will manually collect samples for the classification process. U
 
 We will use images from 2000 and 2023 to collect training samples.
 
-Antropic classes samples should be collected in the year 2000 (and validated in 2023)
+- Antropic classes samples should be collected in the year 2000 (and validated in 2023)
+- Natural classes samples should be collected in the year 2023 (and validated in 2000)
 
-Natural classes samples should be collected in the year 2023 (and validated in 2000)
 ![load image](./figures/samples3.png)
 ![load image](./figures/samples1.png)
 ![load image](./figures/samples2.png)
