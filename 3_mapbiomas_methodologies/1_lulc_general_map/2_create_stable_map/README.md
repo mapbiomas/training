@@ -13,47 +13,85 @@ First, define the basic settings for your analysis, including the territory name
 // Initial Configuration
 // ========================
 
-// Define the country or territory name
-// This should match the name used in the training samples and mosaics
-// The name should be in uppercase and without spaces or separated by underscores
-// For example, 'SURINAME' for Suriname
+// Define the country or territory name.
+// It must match the name used in the training samples and mosaics.
+// Use uppercase letters without spaces or use underscores.
+// Example: 'SURINAME' for Suriname.
 var territory_name = 'SURINAME';
 
-// Folder containing the training samples
-var trained_samples_folder = 'projects/mapbiomas-suriname/assets/LAND-COVER/TRAINING/SAMPLES/STABLE-1';
+// Folder containing the training samples.
+var trained_samples_folder = 'projects/mapbiomas-suriname/assets/LAND-COVER/COLLECTION-1/TRAINING/SAMPLES/STABLE-1';
 
-// Pattern for sample file names
-// The pattern should include a placeholder for the year, e.g., 'suriname_training_samples_{year}_1'
-// The placeholder will be replaced with the actual year during processing
-// For example, 'suriname_training_samples_2000_1' for the year 2000
-var trained_samples_pattern = 'suriname_training_samples_{year}_1';
+// Pattern for sample file names.
+// The pattern must include a placeholder {year}, e.g., 'suriname_training_samples_{year}_1'.
+// This placeholder will be replaced with the actual year during processing.
+// Example: 'suriname_training_samples_2000_1' for the year 2000.
+var trained_samples_pattern = 'suriname_training_samples_{region_id}_{year}_{version}';
 
-// Annual mosaics for the territory
-var mosaics_asset = 'projects/mapbiomas-mosaics/assets/SURINAME/mosaics-1';
+// Asset containing annual mosaics for the territory.
+var mosaics_asset = 'projects/mapbiomas-mosaics/assets/LANDSAT/LULC/SURINAME/mosaics-1';
 
-// Output asset for the stable classification map
+// Path to the regions shapefile.
+var regions_asset = 'projects/mapbiomas-suriname/assets/suriname_classification_regions';
+
+// Output asset path for the stable classification map.
 var output_asset = 'projects/mapbiomas-suriname/assets/LAND-COVER/TRAINING/stable';
 
-// Collection ID and version of the stable map
+// Collection ID and version of the stable map.
 var collection_id = 1.0;
+var sample_version = '1';
 var output_version = '1';
 
-// List of years to be processed
+// Region ID to filter classification regions
+var region_id = '1';
+
+
+var regions = ee.FeatureCollection(regions_asset);
+var selected_region = regions.filter(ee.Filter.eq("region_id", region_id));
+
+// List of years to be processed.
 var years = [
     2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007,
     2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015,
     2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023,
-    2024
 ];
 
-// List of features used for classification
+// List of features used for classification.
 var feature_space = [
-    'red_amp', 'red_median', 'green_amp', 'green_median', 'blue_amp', 'blue_median',
-    'nir_amp', 'nir_median', 'swir1_amp', 'swir1_median', 'swir2_amp', 'swir2_median',
-    'evi2_median_dry', 'evi2_median_wet', 'evi2_stdDev',
-    'ndvi_median_dry', 'ndvi_median_wet', 'ndvi_stdDev',
-    'ndwi_median_dry', 'ndwi_median_wet', 'ndwi_stdDev',
-    'slope'
+    'blue_median',
+    'green_dry',
+    'green_median',
+    'green_min',
+    'red_dry',
+    'red_median',
+    'red_min',
+    'red_wet',
+    'nir_dry',
+    'nir_median',
+    'nir_min',
+    'nir_stdDev',
+    'nir_wet',
+    'swir1_dry',
+    'swir1_median',
+    'swir1_min',
+    'swir1_wet',
+    'swir2_dry',
+    'swir2_median',
+    'swir2_min',
+    'swir2_wet',
+    'ndfi_amp',
+    'ndfi_dry',
+    'ndfi_median'
+];
+
+// Color palette for each land cover class
+var palette = [
+    '#1f8d49', // forest
+    '#519799', // wetland
+    '#d6bc74', // grassland
+    '#ffefc3', // mosaic_of_uses
+    '#db4d4f', // non_vegetated_area
+    '#2532e4'  // water
 ];
 ```
 
@@ -61,16 +99,19 @@ var feature_space = [
 
 ---
 
-## 2. Load Mosaics and Initialize Classifier
+## 2. Load Data and Initialize Classifier
 
 Load the mosaics and prepare the Random Forest classifier with default parameters.
 
 ```javascript
-// Load mosaics for the territory
-var mosaics = ee.ImageCollection(mosaics_asset)
-    .filter(ee.Filter.eq('territory', territory_name));
+// Load Classification Regions
+var regions = ee.FeatureCollection(regions_asset);
+var selected_region = regions.filter(ee.Filter.eq("region_id", region_id));
 
-// Initialize the Random Forest classifier
+// Load mosaics for the territory.
+var mosaics = ee.ImageCollection(mosaics_asset);
+
+// Initialize the Random Forest classifier.
 var classifier = ee.Classifier.smileRandomForest({
     numberOfTrees: 50
 });
@@ -93,22 +134,25 @@ This function trains and applies the Random Forest classifier for each year.
  */
 var classifyRandomForest = function (year) {
 
-    // Load training samples for the year
+    // Load training samples for the specific year.
     var trained_samples_year = ee.FeatureCollection(
-        trained_samples_folder + '/' + trained_samples_pattern.replace('{year}', year)
+        trained_samples_folder + '/' + trained_samples_pattern
+            .replace('{region_id}', region_id)
+            .replace('{year}', year)
+            .replace('{version}', sample_version)
     );
 
-    // Select mosaic for the year
+    // Select the mosaic corresponding to the year.
     var mosaic_year = mosaics.filter(ee.Filter.eq('year', year)).mosaic();
 
-    // Train the classifier with the current year's samples
+    // Train the classifier with the current year's samples.
     var trained_classifier = classifier.train({
         features: trained_samples_year,
-        classProperty: 'class',
+        classProperty: 'class_id',
         inputProperties: feature_space
     });
 
-    // Apply the classifier to the mosaic
+    // Apply the trained classifier to the mosaic.
     var classification = mosaic_year
         .classify(trained_classifier)
         .rename('classification_' + year);
@@ -170,10 +214,12 @@ Select only the stable areas that never changed class.
 // Stable Map Generation
 // ========================
 
+// Retain only the pixels that maintain the same class across all years.
 var stable = classified_stack
-    .multiply(n_classes.eq(1)) // Retain only pixels with the same class across all years
-    .select(0)                 // Select the first band as representative
-    .selfMask()                // Mask null or zero pixels
+    .multiply(n_classes.eq(1))
+    .select(0)                  // Selects the first band as the representative class
+    .selfMask()
+    .clip(selected_region)                  // Masks pixels with no stable classification
     .rename('stable');
 
 // Add metadata to the image
@@ -181,6 +227,7 @@ stable = stable
     .set('collection_id', collection_id)
     .set('version', output_version)
     .set('territory', territory_name);
+
 ```
 
 > **Key Concept:** Multiplying by `n_classes.eq(1)` filters only those pixels that remained the same class throughout all years.
@@ -192,17 +239,11 @@ stable = stable
 You can quickly visualize the stable map.
 
 ```javascript
-// Add stable map to the map viewer
+// Display the stable map on the Map viewer.
 Map.addLayer(stable, {
-    min: 1, 
-    max: 5,
-    palette: [
-        '#0ddf06', 
-        '#98ff00', 
-        '#d94fff', 
-        '#ff2d1c', 
-        '#00ffff'
-    ],
+    min: 3,
+    max: 33,
+    palette: palette,
     format: 'png'
 }, 'stable', true);
 ```
@@ -220,7 +261,9 @@ Once validated, export the stable map to your Earth Engine asset.
 // Export to Asset
 // ========================
 
-var stable_name = territory_name + '-stable-map-' + output_version;
+var stable_name = territory_name + '_STABLE_MAP_{region_id}_{version}'
+    .replace('{region_id}', region_id)
+    .replace('{version}', output_version);
 
 Export.image.toAsset({
     image: stable,
@@ -231,12 +274,11 @@ Export.image.toAsset({
         '.default': 'sample'
     },
     maxPixels: 1e13,
-    region: region_limit
+    region: selected_region,
+    fileFormat: 'GeoTIFF'
 });
 
 ```
-
-> **Caution:** You need to define `region_limit` properly with the boundary geometry.
 
 ---
 

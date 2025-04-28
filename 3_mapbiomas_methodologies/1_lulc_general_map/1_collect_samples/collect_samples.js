@@ -146,7 +146,7 @@ years.forEach(function (year) {
         collection: training_samples,
         properties: ['class_id'],
         scale: 30,
-        geometries: true
+        geometries: true,
     });
 
     print('trained samples', trained_samples);
