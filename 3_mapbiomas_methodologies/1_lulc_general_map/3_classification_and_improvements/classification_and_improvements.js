@@ -47,12 +47,30 @@ var years = [
 
 // List of spectral and terrain features used for classification.
 var feature_space = [
-    'red_amp', 'red_median', 'green_amp', 'green_median', 'blue_amp', 'blue_median',
-    'nir_amp', 'nir_median', 'swir1_amp', 'swir1_median', 'swir2_amp', 'swir2_median',
-    'evi2_median_dry', 'evi2_median_wet', 'evi2_stdDev',
-    'ndvi_median_dry', 'ndvi_median_wet', 'ndvi_stdDev',
-    'ndwi_median_dry', 'ndwi_median_wet', 'ndwi_stdDev',
-    'slope'
+    'blue_median',
+    'green_dry',
+    'green_median',
+    'green_min',
+    'red_dry',
+    'red_median',
+    'red_min',
+    'red_wet',
+    'nir_dry',
+    'nir_median',
+    'nir_min',
+    'nir_stdDev',
+    'nir_wet',
+    'swir1_dry',
+    'swir1_median',
+    'swir1_min',
+    'swir1_wet',
+    'swir2_dry',
+    'swir2_median',
+    'swir2_min',
+    'swir2_wet',
+    'ndfi_amp',
+    'ndfi_dry',
+    'ndfi_median'
 ];
 
 // Define start and end years for mosaic filtering and visualization.
