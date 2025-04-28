@@ -1,4 +1,4 @@
-# Classification
+# Classification and Improvements
 
 This script classifies annual land cover using a Random Forest model in Google Earth Engine. It is divided into several sections to guide beginner users. All code blocks retain original comments and docstrings.
 
