@@ -218,8 +218,8 @@ Select only the stable areas that never changed class.
 var stable = classified_stack
     .multiply(n_classes.eq(1))
     .select(0)                  // Selects the first band as the representative class
-    .selfMask()
-    .clip(selected_region)                  // Masks pixels with no stable classification
+    .selfMask()                 // Masks pixels with no stable classification
+    .clip(selected_region)                  
     .rename('stable');
 
 // Add metadata to the image
