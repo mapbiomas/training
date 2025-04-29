@@ -243,7 +243,7 @@ Map.addLayer(stable, {
     format: 'png'
 }, 'stable', true);
 ```
-
+![load image](./figures/stable-map.png)
 > **Tip:** Adjust the `palette` and `min/max` values according to your classes.
 
 ---

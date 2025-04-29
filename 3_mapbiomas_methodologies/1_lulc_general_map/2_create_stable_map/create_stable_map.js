@@ -34,10 +34,6 @@ var output_version = '1';
 // Region ID to filter classification regions
 var region_id = '1';
 
-
-var regions = ee.FeatureCollection(regions_asset);
-var selected_region = regions.filter(ee.Filter.eq("region_id", region_id));
-
 // List of years to be processed.
 var years = [
     2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007,
@@ -196,6 +192,5 @@ Export.image.toAsset({
         '.default': 'sample'
     },
     maxPixels: 1e13,
-    region: selected_region,
-    fileFormat: 'GeoTIFF'
+    region: selected_region
 });
