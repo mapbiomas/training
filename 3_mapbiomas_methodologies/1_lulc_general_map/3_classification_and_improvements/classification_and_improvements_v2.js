@@ -134,7 +134,6 @@ var training_samples_stable = stable
     });
 
 
-print('TT', training_samples_stable.first())
 
 
 
@@ -290,7 +289,10 @@ years.forEach(function (year) {
     )[0].trained_samples; // Get the 'trained_samples' property
 
     // Generate the output name for the trained samples asset
-    var output_trained_samples_name = output_trained_samples_pattern.replace('{year}', year);
+    var output_trained_samples_name = output_trained_samples_pattern
+        .replace('{year}', year)
+        .replace('{version}', output_version)
+        .replace('{region_id}', region_id);
 
     // Export the training samples to an asset
     Export.table.toAsset({
