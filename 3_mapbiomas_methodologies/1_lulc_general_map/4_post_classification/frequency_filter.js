@@ -28,7 +28,7 @@ var pattern_name = '{territory_name}_{region_id}_{version}';  // Define the patt
 
 
 // Path for input asset
-var input_asset = 'projects/mapbiomas-suriname/assets/LAND-COVER/COLLECTION-1/TRAINING/classification';  // Define the path to the input classification data stored in Google Earth Engine assets.
+var input_asset = 'projects/mapbiomas-suriname/assets/LAND-COVER/COLLECTION-1/TRAINING/classification-ft';  // Define the path to the input classification data stored in Google Earth Engine assets.
 
 // Path for the output asset
 var output_asset = 'projects/mapbiomas-suriname/assets/LAND-COVER/COLLECTION-1/TRAINING/classification-ft';  // Define the path to store the processed output data.
