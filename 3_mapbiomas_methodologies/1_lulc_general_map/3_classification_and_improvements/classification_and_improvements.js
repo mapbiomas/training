@@ -205,14 +205,6 @@ var training_samples_stable = stable
         geometries: true
     });
 
-// Visualize the training samples per class.
-Map.addLayer(training_samples_stable.filter(ee.Filter.eq('class_id', 3)), { color: palette[3] }, 'forest', false);
-Map.addLayer(training_samples_stable.filter(ee.Filter.eq('class_id', 11)), { color: palette[11] }, 'wetland', false);
-Map.addLayer(training_samples_stable.filter(ee.Filter.eq('class_id', 12)), { color: palette[12] }, 'grassland', false);
-Map.addLayer(training_samples_stable.filter(ee.Filter.eq('class_id', 21)), { color: palette[21] }, 'mosaic_of_uses', false);
-Map.addLayer(training_samples_stable.filter(ee.Filter.eq('class_id', 25)), { color: palette[25] }, 'non_vegetated_area', false);
-Map.addLayer(training_samples_stable.filter(ee.Filter.eq('class_id', 33)), { color: palette[33] }, 'water', false);
-
 /**
  * @description Generates random points inside polygons and assigns class labels.
  * @param {ee.FeatureCollection} polygons - The polygons in which random points will be generated.
@@ -277,16 +269,6 @@ var training_samples_additional = ee.FeatureCollection([])
     .merge(water_points)
     .merge(wetland_points)
     .merge(mosaic_of_uses_points);
-
-// Visualize additional training samples.
-Map.addLayer(training_samples_additional.filter(ee.Filter.eq('class_id', 3)), { color: palette[3] }, 'forest additional', false);
-Map.addLayer(training_samples_additional.filter(ee.Filter.eq('class_id', 12)), { color: palette[12] }, 'grassland additional', false);
-Map.addLayer(training_samples_additional.filter(ee.Filter.eq('class_id', 25)), { color: palette[25] }, 'non_vegetated_area additional', false);
-Map.addLayer(training_samples_additional.filter(ee.Filter.eq('class_id', 33)), { color: palette[33] }, 'water additional', false);
-Map.addLayer(training_samples_additional.filter(ee.Filter.eq('class_id', 21)), { color: palette[21] }, 'mosaic_of_uses additional', false);
-Map.addLayer(training_samples_additional.filter(ee.Filter.eq('class_id', 11)), { color: palette[11] }, 'wetland additional', false);
-
-// print('training_samples_additional', training_samples_additional);
 
 // Merge stable and additional training samples.
 var training_samples = training_samples_stable.merge(training_samples_additional);
@@ -367,24 +349,8 @@ Map.addLayer(
     false // Initially not visible
 );
 
-// Add the classified image and export the trained samples for each year
+// Export the trained samples for each year
 years.forEach(function (year) {
-
-    // Add mosaics of the current year to the map
-    Map.addLayer(
-        mosaics.filterMetadata('year', 'equals', year).mosaic().clip(selected_region),
-        vis_params_mosaic,
-        'mosaic_' + year,
-        false // Initially not visible
-    );
-
-    // Add the classified image for the current year to the map.
-    Map.addLayer(
-        classified_stack.select('classification_' + year),
-        vis_params_lulc,
-        'classification_' + year,
-        false // Initially not visible
-    );
 
     // Get the trained samples object for the current year from the classified object stack
     var trained_samples_year = classified_object_stack_list.filter(
@@ -423,3 +389,39 @@ Export.image.toAsset({
     maxPixels: 1e13,
     region: selected_region.geometry().bounds()
 });
+
+// Add the classified image and export the trained samples for each year
+years.forEach(function (year) {
+
+    // Add mosaics of the current year to the map
+    Map.addLayer(
+        mosaics.filterMetadata('year', 'equals', year).mosaic().clip(selected_region),
+        vis_params_mosaic,
+        'mosaic_' + year,
+        false // Initially not visible
+    );
+
+    // Add the classified image for the current year to the map.
+    Map.addLayer(
+        classified_stack.select('classification_' + year),
+        vis_params_lulc,
+        'classification_' + year,
+        false // Initially not visible
+    );
+});
+
+// Visualize the training samples per class.
+Map.addLayer(training_samples_stable.filter(ee.Filter.eq('class_id', 3)), { color: palette[3] }, 'forest', false);
+Map.addLayer(training_samples_stable.filter(ee.Filter.eq('class_id', 11)), { color: palette[11] }, 'wetland', false);
+Map.addLayer(training_samples_stable.filter(ee.Filter.eq('class_id', 12)), { color: palette[12] }, 'grassland', false);
+Map.addLayer(training_samples_stable.filter(ee.Filter.eq('class_id', 21)), { color: palette[21] }, 'mosaic_of_uses', false);
+Map.addLayer(training_samples_stable.filter(ee.Filter.eq('class_id', 25)), { color: palette[25] }, 'non_vegetated_area', false);
+Map.addLayer(training_samples_stable.filter(ee.Filter.eq('class_id', 33)), { color: palette[33] }, 'water', false);
+
+// Visualize additional training samples.
+Map.addLayer(training_samples_additional.filter(ee.Filter.eq('class_id', 3)), { color: palette[3] }, 'forest additional', false);
+Map.addLayer(training_samples_additional.filter(ee.Filter.eq('class_id', 12)), { color: palette[12] }, 'grassland additional', false);
+Map.addLayer(training_samples_additional.filter(ee.Filter.eq('class_id', 25)), { color: palette[25] }, 'non_vegetated_area additional', false);
+Map.addLayer(training_samples_additional.filter(ee.Filter.eq('class_id', 33)), { color: palette[33] }, 'water additional', false);
+Map.addLayer(training_samples_additional.filter(ee.Filter.eq('class_id', 21)), { color: palette[21] }, 'mosaic_of_uses additional', false);
+Map.addLayer(training_samples_additional.filter(ee.Filter.eq('class_id', 11)), { color: palette[11] }, 'wetland additional', false);
