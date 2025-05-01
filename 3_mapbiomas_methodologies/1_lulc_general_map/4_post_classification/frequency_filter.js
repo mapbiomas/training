@@ -9,14 +9,17 @@
 var territory_name = 'SURINAME';  // Define the name of the country or territory to be processed (Suriname in this case).
 
 // Define region id
-var region_id = '2';  // Define the region ID (this could represent a specific area in the country).
+var region_id = '1';  // Define the region ID (this could represent a specific area in the country).
 
 // Define input version
-var input_version = '3';  // Set the version of the input classification data to be processed (version 3).
+var input_version = '5';  // Set the version of the input classification data to be processed (version 3).
 
 // Collection ID and version for the stable map.
 var collection_id = 1.0;  // Set the collection ID for the output map (used for versioning).
-var output_version = '3';  // Set the output version of the processed classification map.
+var output_version = '5a';  // Set the output version of the processed classification map.
+
+// Preview year
+var preview_year = 2023;
 
 
 // Pattern for naming the exported trained samples.
@@ -28,7 +31,7 @@ var pattern_name = '{territory_name}_{region_id}_{version}';  // Define the patt
 
 
 // Path for input asset
-var input_asset = 'projects/mapbiomas-suriname/assets/LAND-COVER/COLLECTION-1/TRAINING/classification';  // Define the path to the input classification data stored in Google Earth Engine assets.
+var input_asset = 'projects/mapbiomas-suriname/assets/LAND-COVER/COLLECTION-1/TRAINING/classification-ft';  // Define the path to the input classification data stored in Google Earth Engine assets.
 
 // Path for the output asset
 var output_asset = 'projects/mapbiomas-suriname/assets/LAND-COVER/COLLECTION-1/TRAINING/classification-ft';  // Define the path to store the processed output data.
@@ -72,14 +75,15 @@ var filterFreq = function(image) {
     var grassland = image.eq(12).expression(exp);  // Calculate frequency for grassland class (value 12).
 
     // Create a new image where pixels are set to 1 if the native vegetation class was stable (present for at least 90% of the time series)
-    var stable_native = ee.Image(0).where(forest  // If the vegetation is forest and has been stable for at least 90% of the time series...
-                                 //.add(savanna)  // (Not used) If savanna class is also stable for at least 90% (commented out).
-                                 .add(wetland)  // If wetland class is stable for at least 90%.
-                                 .add(grassland)  // If grassland class is stable for at least 90%.
-                                 .gte(90), 1);  // Check if the frequency is greater than or equal to 90%, and set to 1 (stable).
+    var stable_native = ee.Image(0)
+        .where(forest  // If the vegetation is forest and has been stable for at least 90% of the time series...
+         //.add(savanna)  // (Not used) If savanna class is also stable for at least 90% (commented out).
+         .add(wetland)  // If wetland class is stable for at least 90%.
+         .add(grassland)  // If grassland class is stable for at least 90%.
+         .gte(90), 1);  // Check if the frequency is greater than or equal to 90%, and set to 1 (stable).
 
     // Visualize the stable native vegetation on the map (not displayed initially).
-    Map.addLayer(stable_native, vis, "stable_native", false);
+    Map.addLayer(stable_native.neq(0).selfMask(), {palette: 'darkgreen'}, "stable_native", false);
 
     // Now, stabilize the native vegetation classes: forest, wetland, and grassland.
     // If the area has been stable (90% of the time), and the frequency threshold for each class is met, set those areas to the respective class.
@@ -100,7 +104,8 @@ var filterFreq = function(image) {
 var classification_filtered = filterFreq(input_classification);
 
 // Display the filtered classification for the year 2023
-Map.addLayer(classification_filtered.select(['classification_2023']), vis, 'filtered');  // Add the filtered classification of the year 2023 to the map.
+Map.addLayer(input_classification.select(['classification_' + preview_year]), vis, 'original');  // Add the filtered classification of the year 2023 to the map.
+Map.addLayer(classification_filtered.select(['classification_' + preview_year]), vis, 'filtered');  // Add the filtered classification of the year 2023 to the map.
 print('Output classification', classification_filtered);  // Print the output filtered classification to the console for verification.
 
 
