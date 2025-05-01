@@ -390,7 +390,7 @@ Export.image.toAsset({
     region: selected_region.geometry().bounds()
 });
 
-// Add the classified image and export the trained samples for each year
+// Add the mosaics and classified images to the map.
 years.forEach(function (year) {
 
     // Add mosaics of the current year to the map

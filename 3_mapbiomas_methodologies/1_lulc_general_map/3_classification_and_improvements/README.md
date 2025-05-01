@@ -490,3 +490,42 @@ Export.image.toAsset({
     region: selected_region.geometry().bounds()
 });
 ```
+
+## Add all layers to the map
+```javascript
+// Add the mosaics and classified images to the map.
+years.forEach(function (year) {
+
+    // Add mosaics of the current year to the map
+    Map.addLayer(
+        mosaics.filterMetadata('year', 'equals', year).mosaic().clip(selected_region),
+        vis_params_mosaic,
+        'mosaic_' + year,
+        false // Initially not visible
+    );
+
+    // Add the classified image for the current year to the map.
+    Map.addLayer(
+        classified_stack.select('classification_' + year),
+        vis_params_lulc,
+        'classification_' + year,
+        false // Initially not visible
+    );
+});
+
+// Visualize the training samples per class.
+Map.addLayer(training_samples_stable.filter(ee.Filter.eq('class_id', 3)), { color: palette[3] }, 'forest', false);
+Map.addLayer(training_samples_stable.filter(ee.Filter.eq('class_id', 11)), { color: palette[11] }, 'wetland', false);
+Map.addLayer(training_samples_stable.filter(ee.Filter.eq('class_id', 12)), { color: palette[12] }, 'grassland', false);
+Map.addLayer(training_samples_stable.filter(ee.Filter.eq('class_id', 21)), { color: palette[21] }, 'mosaic_of_uses', false);
+Map.addLayer(training_samples_stable.filter(ee.Filter.eq('class_id', 25)), { color: palette[25] }, 'non_vegetated_area', false);
+Map.addLayer(training_samples_stable.filter(ee.Filter.eq('class_id', 33)), { color: palette[33] }, 'water', false);
+
+// Visualize additional training samples.
+Map.addLayer(training_samples_additional.filter(ee.Filter.eq('class_id', 3)), { color: palette[3] }, 'forest additional', false);
+Map.addLayer(training_samples_additional.filter(ee.Filter.eq('class_id', 12)), { color: palette[12] }, 'grassland additional', false);
+Map.addLayer(training_samples_additional.filter(ee.Filter.eq('class_id', 25)), { color: palette[25] }, 'non_vegetated_area additional', false);
+Map.addLayer(training_samples_additional.filter(ee.Filter.eq('class_id', 33)), { color: palette[33] }, 'water additional', false);
+Map.addLayer(training_samples_additional.filter(ee.Filter.eq('class_id', 21)), { color: palette[21] }, 'mosaic_of_uses additional', false);
+Map.addLayer(training_samples_additional.filter(ee.Filter.eq('class_id', 11)), { color: palette[11] }, 'wetland additional', false);
+```
