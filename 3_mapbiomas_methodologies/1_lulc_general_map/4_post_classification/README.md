@@ -1,3 +1,14 @@
+# Frequency Filter Script
+
+This Google Earth Engine script applies a frequency filter to land use and land cover classification images based on the consistent presence of native classes (forest, wetlands, and grasslands).
+
+---
+
+## 1. Initial Configuration
+
+Defines the main parameters, such as territory name, region ID, input version, the list of years to be processed, and the color palette used for visualization in the map.
+
+```javascript
 // ========================
 // Initial Configuration
 // ========================
@@ -90,7 +101,15 @@ var vis = {
     palette: palette,
     format: 'png',
 };
+```
 
+---
+
+## 2. calculate_frequency Function
+
+Helper function that calculates the frequency of a given class in a multiband classification image.
+
+```javascript
 /**
  * @description This function calculates the frequency of a specific class in the input image.
  * @param {*} image 
@@ -103,7 +122,15 @@ var calculate_frequency = function (image, class_id) {
     
     return frequency;
 };
+```
 
+---
+
+## 3. frequency_filter_apply Function
+
+Applies a frequency filter for native vegetation classes. It defines specific thresholds and replaces original values based on temporal consistency.
+
+```javascript
 /**
  * 
  * @description
@@ -145,7 +172,15 @@ var frequency_filter_apply = function (image) {
 
     return image_filtered;
 };
+```
 
+---
+
+## 4. Input and Filter Execution
+
+Loads the original classification image based on the defined pattern and applies the filtering function.
+
+```javascript
 // Set input classification
 var input_path = input_asset + '/' + classification_name_pattern
     .replace('{territory_name}', territory_name)
@@ -159,7 +194,30 @@ print('Input classification', classification);
 // Apply the filter function to the input classification image
 var classification_filtered = frequency_filter_apply(classification);
 print('Filtered classification', classification_filtered);
+```
 
+<!-- <p float="left">
+  <img src="./figures/frequency_before.png"/>
+  <img src="./figures/frequency_after.png"/>
+</p> -->
+
+<figure style="display: inline-block; margin-right: 20px; text-align: center;">
+  <img src="./figures/frequency_before.png" style="max-width: 500px;">
+  <figcaption>Before Filter</figcaption>
+</figure>
+
+<figure style="display: inline-block; text-align: center;">
+  <img src="./figures/frequency_after.png" style="max-width: 500px;">
+  <figcaption>After Filter</figcaption>
+</figure>
+
+---
+
+## 5. Export Processed Image
+
+Defines the export name using the naming pattern and exports the filtered result to a new asset in GEE.
+
+```javascript
 // Write metadata to the output classification (important for tracking and exporting)
 classification_filtered = classification_filtered
     .set('description', classification_version_description.join('\n'))
@@ -179,15 +237,23 @@ Export.image.toAsset({
     image: classification_filtered,
     description: output_name,
     assetId: output_asset + '/' + output_name,
-    pyramidingPolicy: { '.default': 'sample' },
+    pyramidingPolicy: {'.default': 'sample'},
     region: classification.geometry().bounds(),
     scale: 30,
     maxPixels: 1e13
 });
+```
 
+---
+
+## 6. Map Visualization
+
+Adds layers to the map for each year defined in the `years` array, allowing side-by-side visualization of the original and filtered classifications.
+
+```javascript
 // Add the original and filtered classification images to the map for visualization
 years.forEach(
-    function (year) {
+    function(year) {
         // Define the band name for the current year
         var band = 'classification_' + year.toString();
 
@@ -198,7 +264,9 @@ years.forEach(
         var classification_filtered_year = classification_filtered.select([band]);
 
         // Add layers to the map for visualization
-        Map.addLayer(classification_year, vis, band, false);
-        Map.addLayer(classification_filtered_year, vis, band + '_filtered', false);
+        Map.addLayer(classification_year, vis, band);
+        Map.addLayer(classification_filtered_year, vis, band + '_filtered');
     }
 );
+
+```
