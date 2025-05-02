@@ -198,13 +198,13 @@ print('Filtered classification', classification_filtered);
 
 <p float="left">
 <figure style="display: inline-block; margin-right: 20px; text-align: center;">
-<img src="./figures/frequency_before.png" style="max-width: 500px;">
 <figcaption>Before Filter</figcaption>
+<img src="./figures/frequency_before.png" style="max-width: 500px;">
 </figure>
 
 <figure style="display: inline-block; text-align: center;">
-<img src="./figures/frequency_after.png" style="max-width: 500px;">
 <figcaption>After Filter</figcaption>
+<img src="./figures/frequency_after.png" style="max-width: 500px;">
 </figure>
 
 </p>
