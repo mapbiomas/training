@@ -24,7 +24,7 @@ var years = [
 ];
 
 // Pattern for naming the exported trained samples.
-// Use '{year}' as a placeholder to be replaced with each processing year.
+// Use '{territory_name}' as a placeholder for the territory name.
 // Use '{version}' as a placeholder for the version number.
 // Use '{region_id}' to specify the region ID.
 // Example: 'SURINAME_1_5' for the classification of region with region_id 1 and input_version 1.
