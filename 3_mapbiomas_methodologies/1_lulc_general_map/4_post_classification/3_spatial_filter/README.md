@@ -129,4 +129,56 @@ var years_index = ee.List.sequence(0, years.length - 1);
 
 ---
 
-### 3. Gap Fill Functions
+### 3. Spatial Filter
+
+// Create a list of years (update here and the rest of the code adjusts automatically).
+var years = ee.List.sequence(1985, 2024)                                                           
+                  .map(function(y){                                                     
+                        return ee.Number(y).int(); });
+
+// Create an image collection by processing each year.
+var class_outTotal = ee.ImageCollection(years
+                       .map(function(year){
+                          // Construct band names dynamically.
+                          var anoStr    = ee.Number(year).format();
+                          var nomeBanda = ee.String('classification_').cat(anoStr);
+                          var connBanda = ee.String('classification_').cat(anoStr).cat('_conn');
+                          
+                          // Apply a focal mode filter to the classification image.
+                          var moda = classREMAP.select(nomeBanda).focalMode(3, 'square', 'pixels')
+                          // Filter the mode image by masking just the pixels with less than 6 connected pixels.
+                                               .mask(classREMAP.select(connBanda).lte(min_connect_pixel));
+                          //Map.addLayer(moda.reproject({crs: 'EPSG:4326',scale: 30}), vis2, 'class_out_'+ano, false);
+
+                          // Blend the original and filtered classifications.
+                          var class_out = classREMAP.select(nomeBanda).blend(moda);
+                          //Map.addLayer(class_out.reproject({crs: 'EPSG:4326',scale: 30}), vis2, 'class_out_'+ano, false);
+                     
+                          return class_out;
+})).toBands();
+
+// Function to correct band names after 'toBands()'.
+var corrIndx  = function (img){
+                  var indxNames = img.bandNames();              // creates an ee.List from bands of an ee.Image.
+                  var bandNames = indxNames.map(function(nome){ // remove the index created by .toBands().
+                          return ee.String(nome).split('_').slice(1).join('_');
+                                      });
+                                      
+                    return img.select(indxNames,bandNames);     // replaces bands with 'XX_' created by .toBands() with clean names.
+                              };
+
+// Correct band names and reproject the final classification.
+var class_final = corrIndx(class_outTotal).reproject({
+                            crs: 'EPSG:4326',
+                            scale: 30  // export with 30 m/pixel.
+                              });
+
+// Print and add the final classification to the map.
+print(class_final);
+//Map.setCenter(-47.85706, -21.38321,13);
+Map.addLayer(class_final.reproject({
+                            crs: 'EPSG:4326',
+                            scale: 30  // export with 30 m/pixel.
+                              }), vis, 'class_final');
+// Map.addLayer(class_out2, vis, 'class_out2');
+
