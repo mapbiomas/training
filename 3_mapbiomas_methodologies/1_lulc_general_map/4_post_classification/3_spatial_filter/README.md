@@ -1,13 +1,14 @@
 # Spatial Filters
 
 
-This script performs a **temporal gap fill filter** on annual land cover classification maps using Google Earth Engine (GEE). The goal is to fill missing pixel values (`no data`) by using valid values from previous and subsequent years.
+This script performs a **spatial filter** on annual land cover classification maps using Google Earth Engine (GEE).
 
 ---
 
 ## Script Overview
 
-The script processes classification maps by applying both **forward fill** (using the previous year) and **backward fill** (using the following year) strategies. The result is a more complete, temporally consistent dataset.
+A focal mode filter is applied to smooth the classification, aiming to remove small, isolated patches of classification. This is controlled by min_connect_pixel. 
+Only pixels with at least this many connected pixels of the same class are retained; others are masked out..
 
 ---
 
