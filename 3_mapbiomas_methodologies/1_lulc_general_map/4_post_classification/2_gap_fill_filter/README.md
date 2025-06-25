@@ -261,11 +261,86 @@ print('output classification', fully_filled);
 
 ---
 
-### 5. Add Metadata
+### 5. Add _conn band with number of connected pixels
+
+```js
+var image = fully_filled
+
+// Define the years to process
+var years = [
+    1985, 1986, 1987, 1988, 1989, 1990, 1991, 1992,
+    1993, 1994, 1995, 1996, 1997, 1998, 1999, 2000,
+    2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008,
+    2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016,
+    2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024
+    ];
+
+// Create a list of band names
+var bandNames = ee.List(
+    years.map(
+        function (year) {
+            return 'classification_' + String(year);
+        }
+    )
+);
+
+// Generate a histogram dictionary of band names and image band names
+var bandsOccurrence = ee.Dictionary(
+    bandNames.cat(image.bandNames()).reduce(ee.Reducer.frequencyHistogram())
+);
+
+//print(bandsOccurrence);
+
+// Create a dictionary of bands with masked bands
+var bandsDictionary = bandsOccurrence.map(
+    function (key, value) {
+        return ee.Image(
+            ee.Algorithms.If(
+                ee.Number(value).eq(2),
+                // If the band occurs twice, select the band from the original image
+                image.select([key]).byte(),
+                // If the band occurs once, create a masked band
+                ee.Image().rename([key]).byte().updateMask(image.select(0))
+            )
+        );
+    }
+);
+
+// Convert the dictionary to an image
+var imageAllBands = ee.Image(
+    bandNames.iterate(
+        function (band, image) {
+            // Add the band from the dictionary to the image
+            return ee.Image(image).addBands(bandsDictionary.get(ee.String(band)));
+        },
+        // Initialize the image with an empty selection
+        ee.Image().select()
+    )
+);
+
+// Generate an image of pixel years
+var imagePixelYear = ee.Image.constant(years)
+    .updateMask(imageAllBands)
+    .rename(bandNames);
+    
+// Add connected pixels bands
+var imageFilledConnected = image.addBands(
+    image
+        .connectedPixelCount(100, true)
+        .rename(bandNames.map(
+            function (band) {
+                return ee.String(band).cat('_conn');
+            }
+        ))
+);
+
+
+
+### 6. Add Metadata
 
 ```js
 // Write metadata to the output classification (important for tracking and exporting)
-var classification_filtered = fully_filled
+var classification_filtered = imageFilledConnected
     .set('description', classification_version_description.join('\n'))
     .set('collection_id', collection_id)
     .set('version', output_version)
@@ -292,7 +367,7 @@ Export.image.toAsset({
     description: output_name,
     assetId: output_asset + '/' + output_name,
     pyramidingPolicy: { '.default': 'sample' },
-    region: classification.geometry().bounds(),
+    region: classification_filtered.geometry().bounds(),
     scale: 30,
     maxPixels: 1e13
 });
