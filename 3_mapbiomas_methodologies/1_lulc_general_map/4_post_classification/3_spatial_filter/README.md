@@ -30,8 +30,8 @@ var region_id = '2';
 
 // Collection ID and version for the stable map.
 var collection_id = 1.0;
-var input_version = '2';
-var output_version = '2a';
+var input_version = '2a';
+var output_version = '3';
 
 // List of years to be processed.
 var years = [
@@ -48,7 +48,7 @@ var years = [
 var classification_name_pattern = '{territory_name}_{region_id}_{version}';
 
 // Path for input asset
-var input_asset = 'projects/mapbiomas-suriname/assets/LAND-COVER/COLLECTION-1/TRAINING/classification';
+var input_asset = 'projects/mapbiomas-suriname/assets/LAND-COVER/COLLECTION-1/TRAINING/classification-ft';
 
 // Path for the output asset
 var output_asset = 'projects/mapbiomas-suriname/assets/LAND-COVER/COLLECTION-1/TRAINING/classification-ft';
