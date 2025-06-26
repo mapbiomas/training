@@ -1,4 +1,4 @@
-# Merge Regional Land Cover Classification
+# Merge Regional & Integration
 
 This script performs a **merge** on annual land cover classification regional maps using Google Earth Engine (GEE). 
 
