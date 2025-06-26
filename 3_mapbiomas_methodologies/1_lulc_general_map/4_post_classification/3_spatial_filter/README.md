@@ -62,51 +62,11 @@ var classification_version_description = [
     "- **Region ID**: {region_id}",
 ];
 
-// Color palette for each land cover class
-var palette = [
-    '#ffffff', // 0 - no data
-    '#000000', // 1
-    '#000000', // 2
-    '#1f8d49', // 3 - forest
-    '#000000', // 4
-    '#000000', // 5
-    '#000000', // 6
-    '#000000', // 7
-    '#000000', // 8
-    '#000000', // 9
-    '#000000', // 10
-    '#519799', // 11 - wetland
-    '#d6bc74', // 12 - grassland
-    '#000000', // 13
-    '#000000', // 14
-    '#000000', // 15
-    '#000000', // 16
-    '#000000', // 17
-    '#000000', // 18
-    '#000000', // 19
-    '#000000', // 20
-    '#ffefc3', // 21 - mosaic_of_uses
-    '#000000', // 22
-    '#000000', // 23
-    '#000000', // 24
-    '#db4d4f', // 25 - non_vegetated_area
-    '#000000', // 26
-    '#000000', // 27
-    '#000000', // 28
-    '#000000', // 29
-    '#000000', // 30
-    '#000000', // 31
-    '#000000', // 32
-    '#2532e4', // 33 - water
-];
+// Import the palettes module
+var palettes = require('users/mapbiomas/modules:Palettes.js');
 
-// Visualization parameters for the map
-var vis = {
-    min: 0,
-    max: 33,
-    palette: palette,
-    format: 'png',
-};
+// Define the palettes for visualization
+var vis = {'min': 0,'max': 69,'palette': palettes.get('classification9'), format: 'png'};
 ```
 ---
 
