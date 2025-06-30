@@ -47,9 +47,12 @@ var region_id = '1';
 
 // List of years to be processed.
 var years = [
+    1985, 1986, 1987, 1988, 1989, 1990, 1991, 1992,
+    1993, 1994, 1995, 1996, 1997, 1998, 1999,
     2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007,
     2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015,
     2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023,
+    2024,
 ];
 
 // List of features used for classification.
@@ -80,15 +83,12 @@ var feature_space = [
     'ndfi_median'
 ];
 
-// Color palette for each land cover class
-var palette = [
-    '#1f8d49', // forest
-    '#519799', // wetland
-    '#d6bc74', // grassland
-    '#ffefc3', // mosaic_of_uses
-    '#db4d4f', // non_vegetated_area
-    '#2532e4'  // water
-];
+
+// Import the palettes module
+var palettes = require('users/mapbiomas/modules:Palettes.js');
+
+// Define the palettes for visualization
+var vis = {'min': 0,'max': 69,'palette': palettes.get('classification9'), format: 'png'};
 ```
 
 > **Note:** Ensure that the asset paths are correctly set and that you have access permissions.
