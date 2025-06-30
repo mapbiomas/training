@@ -85,15 +85,16 @@ classification_version_description = classification_version_description.join("\n
 
 // Print the classification version description.
 print('Classification Version Description:', classification_version_description);
-
-// List of years to be processed.
 var years = [
+    1985, 1986, 1987, 1988, 1989, 1990, 1991, 1992,
+    1993, 1994, 1995, 1996, 1997, 1998, 1999,
     2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007,
     2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015,
     2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023,
+    2024,
 ];
 
-// List of spectral and terrain features used for classification.
+// List of features used for classification.
 var feature_space = [
     'blue_median',
     'green_dry',
@@ -121,9 +122,10 @@ var feature_space = [
     'ndfi_median'
 ];
 
+
 // Define start and end years for mosaic filtering and visualization.
-var start_year = 2000;
-var end_year = 2023;
+var start_year = 1985;
+var end_year = 2024;
 
 // Number of random samples per class for the stable map.
 var n_samples_per_class = [
@@ -135,43 +137,8 @@ var n_samples_per_class = [
     { 'class_id': 33, 'n_samples': 50 },  // water
 ];
 
-// Color palette for each land cover class
-var palette = [
-    '#ffffff', // 0 - no data
-    '#000000', // 1
-    '#000000', // 2
-    '#1f8d49', // 3 - forest
-    '#000000', // 4
-    '#000000', // 5
-    '#000000', // 6
-    '#000000', // 7
-    '#000000', // 8
-    '#000000', // 9
-    '#000000', // 10
-    '#519799', // 11 - wetland
-    '#d6bc74', // 12 - grassland
-    '#000000', // 13
-    '#000000', // 14
-    '#000000', // 15
-    '#000000', // 16
-    '#000000', // 17
-    '#000000', // 18
-    '#000000', // 19
-    '#000000', // 20
-    '#ffefc3', // 21 - mosaic_of_uses
-    '#000000', // 22
-    '#000000', // 23
-    '#000000', // 24
-    '#db4d4f', // 25 - non_vegetated_area
-    '#000000', // 26
-    '#000000', // 27
-    '#000000', // 28
-    '#000000', // 29
-    '#000000', // 30
-    '#000000', // 31
-    '#000000', // 32
-    '#2532e4', // 33 - water
-];
+// Import the palettes module
+var palette = require('users/mapbiomas/modules:Palettes.js').get('classification9');
 
 // Define visualization parameters for land cover classification
 var vis_params_lulc = {
