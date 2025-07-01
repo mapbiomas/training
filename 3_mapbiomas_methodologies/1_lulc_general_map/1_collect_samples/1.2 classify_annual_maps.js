@@ -128,3 +128,24 @@ var classifyRandomForest = function (year) {
 // Apply the classification to all years.
 var classified_stack_list = years.map(classifyRandomForest);
 
+
+// ========================
+// Export to Asset
+// ========================
+
+var stable_name = territory_name + '_ANNUAL_MAP_{region_id}_{version}'
+    .replace('{region_id}', region_id)
+    .replace('{version}', output_version);
+
+Export.image.toAsset({
+    image: classified_stack_list,
+    description: classified_stack_list,
+    assetId: output_asset + '/' + stable_name,
+    scale: 30,
+    pyramidingPolicy: {
+        '.default': 'sample'
+    },
+    maxPixels: 1e13,
+    region: selected_region
+});
+
