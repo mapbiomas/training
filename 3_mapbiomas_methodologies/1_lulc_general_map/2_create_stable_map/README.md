@@ -236,12 +236,7 @@ You can quickly visualize the stable map.
 
 ```javascript
 // Display the stable map on the Map viewer.
-Map.addLayer(stable, {
-    min: 3,
-    max: 33,
-    palette: palette,
-    format: 'png'
-}, 'stable', true);
+Map.addLayer(stable, vis, 'stable', true);
 ```
 ![load image](./figures/stable-map.png)
 > **Tip:** Adjust the `palette` and `min/max` values according to your classes.
