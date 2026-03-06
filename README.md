@@ -18,27 +18,26 @@ Introductory materials for those starting with satellite imagery, including pre-
 ### 2. GEE for LULC Mapping
 Practical scripts to handle large-scale datasets, including:
 
+Class 1 - Introduction to Google Earth Engine
+
+Class 2 - Accessing Satellite Images and Creating Mosaics
+
+Class 3 - Classification using Random Forest
+
+
+---
+
+### 3. MapBiomas General Metodology
+Specialized scripts to extract deep insights from the data, such as:
+
 Classification Algorithms: Implementation of Random Forest and other machine learning models.
 
 Temporal Filters: Logic to reduce classification "noise" across the time series.
 
 Integration: Merging different thematic maps into a single final coverage product.
 
----
-
-### 3. Advanced LULC Dynamics (Thematic Analysis)
-Specialized scripts to extract deep insights from the data, such as:
-
-Class Age: Measures how long a specific land use has persisted.
-
-Transition Dynamics: Calculates the number of changes and land-use "swaps."
-
-Stability & Footprints: Identifies areas that never changed or the historical spatial reach of a class.
-
-Frequency: Temporal recurrence of specific classes over the decades.
-
 ## 🌎 Global Replication
-A core mission of MapBiomas is to be an open-source initiative. These materials are designed to be adaptable, helping teams across the Amazon, Chaco, Pampa, and other international regions to implement their own monitoring systems using a proven, peer-reviewed methodology.
+A core mission of MapBiomas is to be an open-source initiative. These materials are designed to be adaptable, helping other countries to implement their own monitoring systems using a proven, peer-reviewed methodology.
 
 ## 🛠️ How to Use
 Navigate to the folder containing the script of interest.
