@@ -1,12 +1,13 @@
-MapBiomas Training: Remote Sensing & Google Earth Engine
+# MapBiomas Training: Remote Sensing & Google Earth Engine
+
 Welcome to the official repository for MapBiomas Training materials. This space is dedicated to providing high-level educational resources for Remote Sensing (RS) and cloud computing via Google Earth Engine (GEE).
 
 The primary objective of this repository is to share the expertise developed by the MapBiomas network, offering the scripts and logic used to produce our annual Land Use and Land Cover (LULC) collections and supporting the replication of this methodology in other countries and biomes.
 
-🚀 Getting Started
+# 🚀 Getting Started
 The JavaScript scripts provided in this repository are specifically designed for use within the Google Earth Engine (GEE) Code Editor. To utilize these tools, simply copy the code from the desired .js file and paste it directly into the GEE web interface. These scripts leverage the MapBiomas API and Earth Engine's distributed computing power to perform advanced temporal analysis, allowing for seamless replication of the environmental metrics described in this documentation.
 
-📚 Repository Content
+# 📚 Repository Content
 This repository is organized into modules that cover the entire workflow of a MapBiomas-style analysis:
 
 1. Remote Sensing Fundamentals
